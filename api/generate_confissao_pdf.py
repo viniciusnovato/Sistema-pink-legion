@@ -1,25 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# Corrigir problema de compatibilidade do ReportLab com Python mais recente
-# DEVE ser feito ANTES de importar qualquer coisa do ReportLab
-import hashlib
-import sys
-
-# Patch completo para hashlib.md5 - remove usedforsecurity
-_original_md5 = hashlib.md5
-
-def _patched_md5(*args, **kwargs):
-    # Remove o parâmetro usedforsecurity se presente
-    kwargs.pop('usedforsecurity', None)
-    return _original_md5(*args, **kwargs)
-
-# Substitui a função md5 globalmente
-hashlib.md5 = _patched_md5
-
-# Agora importa o Flask e ReportLab
-from flask import Flask, request, jsonify, send_file, render_template_string, Response
-from flask_cors import CORS
+from flask import request, jsonify, Response
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
@@ -31,9 +10,18 @@ import os
 from datetime import datetime
 import tempfile
 import io
+import hashlib
 
-app = Flask(__name__)
-CORS(app)
+# Patch completo para hashlib.md5 - remove usedforsecurity
+_original_md5 = hashlib.md5
+
+def _patched_md5(*args, **kwargs):
+    # Remove o parâmetro usedforsecurity se presente
+    kwargs.pop('usedforsecurity', None)
+    return _original_md5(*args, **kwargs)
+
+# Substitui a função md5 globalmente
+hashlib.md5 = _patched_md5
 
 class ConfissaoDividaPDFGenerator:
     def __init__(self):
@@ -212,10 +200,10 @@ class ConfissaoDividaPDFGenerator:
         except:
             return date_string
 
-def handler(request):
-    if request.method == 'POST':
+def handler(req):
+    if req.method == 'POST':
         try:
-            data = request.get_json()
+            data = req.get_json()
             if not data:
                 return jsonify({'error': 'Dados não fornecidos'}), 400
             

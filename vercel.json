@@ -1,43 +1,25 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "pdf_generator.py",
-      "use": "@vercel/python"
+  "functions": {
+    "api/generate-pdf.py": {
+      "runtime": "python3.9"
     },
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.js",
-      "use": "@vercel/static"
+    "api/generate_confissao_pdf.py": {
+      "runtime": "python3.9"
     }
-  ],
+  },
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/pdf_generator.py"
+      "src": "/api/generate-pdf",
+      "dest": "/api/generate-pdf.py"
     },
     {
-      "src": "/generate-pdf",
-      "dest": "/pdf_generator.py"
+      "src": "/api/generate_confissao_pdf",
+      "dest": "/api/generate_confissao_pdf.py"
     },
     {
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "functions": {
-    "pdf_generator.py": {
-      "runtime": "python3.9"
-    }
-  },
-  "env": {
-    "PYTHONPATH": "./"
-  }
+  ]
 }
