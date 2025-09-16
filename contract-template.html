@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrato de Compra e Venda de Automóvel</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #000;
+            background: white;
+            padding: 2cm;
+            max-width: 21cm;
+            margin: 0 auto;
+        }
+        
+        .contract-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 20px;
+        }
+        
+        .contract-title {
+            font-size: 18pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .contract-number {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .parties-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        
+        .parties-title {
+            font-size: 14pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .party {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #333;
+        }
+        
+        .party-name {
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 5px;
+        }
+        
+        .party-details {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .contract-intro {
+            text-align: justify;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        
+        .clause {
+            margin: 25px 0;
+            page-break-inside: avoid;
+        }
+        
+        .clause-title {
+            font-weight: bold;
+            font-size: 13pt;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #e8e8e8;
+            border-left: 5px solid #333;
+        }
+        
+        .clause-content {
+            padding: 0 15px;
+            text-align: justify;
+        }
+        
+        .clause-item {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .vehicle-specs {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .vehicle-specs ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .vehicle-specs li {
+            padding: 5px 0;
+            border-bottom: 1px dotted #ccc;
+        }
+        
+        .vehicle-specs li:last-child {
+            border-bottom: none;
+        }
+        
+        .payment-details {
+            background-color: #fff8dc;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .highlight {
+            font-weight: bold;
+            color: #000;
+        }
+        
+        .signature-section {
+            margin-top: 50px;
+            page-break-inside: avoid;
+        }
+        
+        .signature-date {
+            text-align: center;
+            margin: 40px 0;
+            font-style: italic;
+        }
+        
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+        }
+        
+        .signature-box {
+            width: 45%;
+            text-align: center;
+        }
+        
+        .signature-line {
+            border-bottom: 2px solid #000;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        
+        .signature-label {
+            font-weight: bold;
+            font-size: 11pt;
+        }
+        
+        @media print {
+            body {
+                padding: 1.5cm;
+            }
+            
+            .clause {
+                page-break-inside: avoid;
+            }
+            
+            .signature-section {
+                page-break-before: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="contract-content">
+        <!-- Content will be dynamically inserted here -->
+    </div>
+</body>
+</html>

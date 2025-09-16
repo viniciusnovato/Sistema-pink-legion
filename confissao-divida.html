@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termo de Confissão de Dívida</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Termo de Confissão de Dívida</h1>
+            <p>Preencha as informações abaixo para gerar o termo em PDF</p>
+            <a href="index.html" class="back-button">← Voltar ao Menu Principal</a>
+        </header>
+
+        <form id="confissaoForm" class="contract-form">
+            <div class="form-section">
+                <h2>Informações do Devedor</h2>
+                
+                <div class="form-group">
+                    <label for="numeroConfissao">Nº da Confissão de Dívida:</label>
+                    <input type="text" id="numeroConfissao" name="numeroConfissao" readonly style="background-color: #f5f5f5;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="nomeDevedor">Nome Completo do Devedor:</label>
+                    <input type="text" id="nomeDevedor" name="nomeDevedor" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cartaoCidadaoDevedor">Nº do Cartão de Cidadão:</label>
+                    <input type="text" id="cartaoCidadaoDevedor" name="cartaoCidadaoDevedor" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nifDevedor">NIF do Devedor:</label>
+                    <input type="text" id="nifDevedor" name="nifDevedor" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="moradaDevedor">Morada do Devedor:</label>
+                    <textarea id="moradaDevedor" name="moradaDevedor" rows="3" required></textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Informações do Contrato Original</h2>
+                
+                <div class="form-group">
+                    <label for="numeroContrato">Nº do Contrato de Compra e Venda:</label>
+                    <input type="text" id="numeroContrato" name="numeroContrato" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="valorTotal">Valor Total da Dívida (€):</label>
+                    <input type="number" id="valorTotal" name="valorTotal" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="valorTotalExtenso">Valor Total por Extenso:</label>
+                    <input type="text" id="valorTotalExtenso" name="valorTotalExtenso" readonly style="background-color: #f5f5f5;">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Plano de Pagamento</h2>
+                
+                <div class="form-group">
+                    <label for="entradaInicial">Entrada Inicial (€):</label>
+                    <input type="number" id="entradaInicial" name="entradaInicial" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="entradaInicialExtenso">Entrada Inicial por Extenso:</label>
+                    <input type="text" id="entradaInicialExtenso" name="entradaInicialExtenso" readonly style="background-color: #f5f5f5;">
+                </div>
+
+                <div class="form-group">
+                    <label for="saldoRemanescente">Saldo Remanescente (€):</label>
+                    <input type="number" id="saldoRemanescente" name="saldoRemanescente" step="0.01" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="numeroPrestacoes">Número de Prestações Mensais:</label>
+                    <input type="number" id="numeroPrestacoes" name="numeroPrestacoes" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="valorPrestacao">Valor de Cada Prestação (€):</label>
+                    <input type="number" id="valorPrestacao" name="valorPrestacao" step="0.01" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="valorPrestacaoExtenso">Valor da Prestação por Extenso:</label>
+                    <input type="text" id="valorPrestacaoExtenso" name="valorPrestacaoExtenso" readonly style="background-color: #f5f5f5;">
+                </div>
+
+                <div class="form-group">
+                    <label for="dataPrimeiraPrestacao">Data da Primeira Prestação:</label>
+                    <input type="date" id="dataPrimeiraPrestacao" name="dataPrimeiraPrestacao" required>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Dados Bancários para Pagamento</h2>
+                
+                <div class="form-group">
+                    <label for="ibanCredor">IBAN do Credor:</label>
+                    <input type="text" id="ibanCredor" name="ibanCredor" required>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Informações Adicionais</h2>
+                
+                <div class="form-group">
+                    <label for="dataAssinatura">Data de Assinatura:</label>
+                    <input type="date" id="dataAssinatura" name="dataAssinatura" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="localAssinatura">Local de Assinatura:</label>
+                    <input type="text" id="localAssinatura" name="localAssinatura" value="Maia" required>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Gerar Termo PDF</button>
+                <button type="button" id="clearForm" class="btn-secondary">Limpar Formulário</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="confissao-script.js"></script>
+</body>
+</html>
