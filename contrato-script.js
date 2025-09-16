@@ -15,29 +15,29 @@ class VehicleContractGenerator {
         // Cálculo automático do valor remanescente
         const precoTotal = document.getElementById('precoTotal');
         const sinal = document.getElementById('sinal');
-        const entradaInicial = document.getElementById('entradaInicial');
+        const numeroPrestacoes = document.getElementById('numeroPrestacoes');
         
         if (precoTotal) {
-            precoTotal.addEventListener('input', this.calculateRemaining);
+            precoTotal.addEventListener('input', () => this.calculateRemaining());
         }
         if (sinal) {
-            sinal.addEventListener('input', this.calculateRemaining);
+            sinal.addEventListener('input', () => this.calculateRemaining());
         }
-        if (entradaInicial) {
-            entradaInicial.addEventListener('input', this.calculateRemaining);
+        if (numeroPrestacoes) {
+            numeroPrestacoes.addEventListener('input', () => this.calculateInstallment());
         }
 
-        // Preenchimento automático do campo "Relativamente ao contrato" com o NIF
-        const nifField = document.getElementById('nif');
+        // Preenchimento automático do campo "Relativamente ao contrato" com o NIF da Empresa
+        const nifEmpresaField = document.getElementById('nifEmpresa');
         const numeroContratoField = document.getElementById('numeroContrato');
         
-        if (nifField && numeroContratoField) {
+        if (nifEmpresaField && numeroContratoField) {
             // Preencher inicialmente
-            numeroContratoField.value = nifField.value;
+            numeroContratoField.value = nifEmpresaField.value;
             
-            // Atualizar quando o NIF mudar
-            nifField.addEventListener('input', () => {
-                numeroContratoField.value = nifField.value;
+            // Atualizar quando o NIF da Empresa mudar
+            nifEmpresaField.addEventListener('input', () => {
+                numeroContratoField.value = nifEmpresaField.value;
             });
         }
 
@@ -45,6 +45,12 @@ class VehicleContractGenerator {
         const clearBtn = document.getElementById('clearForm');
         if (clearBtn) {
             clearBtn.addEventListener('click', () => this.clearForm());
+        }
+
+        // Gerar PDF
+        const generatePDFBtn = document.getElementById('generatePDF');
+        if (generatePDFBtn) {
+            generatePDFBtn.addEventListener('click', () => this.generatePDF());
         }
     }
 
@@ -93,13 +99,27 @@ class VehicleContractGenerator {
     calculateRemaining() {
         const precoTotal = parseFloat(document.getElementById('precoTotal')?.value) || 0;
         const sinal = parseFloat(document.getElementById('sinal')?.value) || 0;
-        const entradaInicial = parseFloat(document.getElementById('entradaInicial')?.value) || 0;
         
-        const valorRemanescente = precoTotal - sinal - entradaInicial;
+        const valorRemanescente = precoTotal - sinal;
         
         const remanescente = document.getElementById('valorRemanescente');
         if (remanescente) {
-            remanescente.value = valorRemanescente.toFixed(2);
+            remanescente.value = valorRemanescente >= 0 ? valorRemanescente.toFixed(2) : '0.00';
+        }
+
+        // Calcular valor da prestação automaticamente
+        this.calculateInstallment();
+    }
+
+    calculateInstallment() {
+        const valorRemanescente = parseFloat(document.getElementById('valorRemanescente')?.value) || 0;
+        const numeroPrestacoes = parseInt(document.getElementById('numeroPrestacoes')?.value) || 1;
+        
+        const valorPrestacao = valorRemanescente / numeroPrestacoes;
+        
+        const prestacao = document.getElementById('valorPrestacao');
+        if (prestacao) {
+            prestacao.value = valorPrestacao >= 0 ? valorPrestacao.toFixed(2) : '0.00';
         }
     }
 
@@ -267,7 +287,7 @@ class VehicleContractGenerator {
             console.log('Dados enviados para o servidor:', data);
             
             // Enviar dados para o servidor
-            const response = await fetch('/generate-pdf', {
+            const response = await fetch('/api/generate-pdf', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
