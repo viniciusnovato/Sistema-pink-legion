@@ -222,3 +222,43 @@ def handler(req):
             return jsonify({'error': f'Erro ao gerar PDF: {str(e)}'}), 500
     else:
         return jsonify({'error': 'Método não permitido'}), 405
+
+# Ponto de entrada principal para execução como script CGI
+if __name__ == '__main__':
+    import sys
+    import os
+    
+    # Verificar se está sendo executado como CGI
+    if os.environ.get('REQUEST_METHOD'):
+        try:
+            # Ler dados do stdin
+            content_length = int(os.environ.get('CONTENT_LENGTH', 0))
+            if content_length > 0:
+                post_data = sys.stdin.buffer.read(content_length)
+                data = json.loads(post_data.decode('utf-8'))
+                
+                generator = ConfissaoDividaPDFGenerator()
+                pdf_buffer = generator.generate_confissao_pdf(data)
+                
+                # Enviar headers CGI
+                print('Content-Type: application/pdf')
+                print('Content-Disposition: attachment; filename=confissao_divida.pdf')
+                print()  # Linha vazia para separar headers do body
+                
+                # Enviar PDF para stdout
+                sys.stdout.buffer.write(pdf_buffer.getvalue())
+            else:
+                print('Content-Type: application/json')
+                print()
+                print(json.dumps({'error': 'Dados não fornecidos'}))
+                
+        except json.JSONDecodeError:
+            print('Content-Type: application/json')
+            print()
+            print(json.dumps({'error': 'JSON inválido'}))
+        except Exception as e:
+            print('Content-Type: application/json')
+            print()
+            print(json.dumps({'error': f'Erro ao gerar PDF: {str(e)}'}))
+    else:
+        print("Este script deve ser executado como CGI ou através do servidor HTTP")

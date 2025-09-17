@@ -1,22 +1,40 @@
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import mm
+from reportlab.lib.units import mm, cm
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
+from datetime import datetime
+import io
 import hashlib
 import json
 
-# Patch para hashlib.md5 para compatibilidade com Python 3.9+
+# Patch mais abrangente para hashlib.md5 para compatibilidade com Python 3.8
+import hashlib
 original_md5 = hashlib.md5
+
 def patched_md5(*args, **kwargs):
+    # Remove o parâmetro usedforsecurity se presente
     kwargs.pop('usedforsecurity', None)
     return original_md5(*args, **kwargs)
+
+# Aplica o patch globalmente
 hashlib.md5 = patched_md5
+
+# Também patch para reportlab se necessário
+try:
+    from reportlab.pdfbase import pdfdoc
+    original_pdfdoc_md5 = pdfdoc.md5
+    def patched_pdfdoc_md5(*args, **kwargs):
+        kwargs.pop('usedforsecurity', None)
+        return original_pdfdoc_md5(*args, **kwargs)
+    pdfdoc.md5 = patched_pdfdoc_md5
+except ImportError:
+    pass
 
 class ContractPDFGenerator:
     def __init__(self):
@@ -252,3 +270,43 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
         error_response = json.dumps({'error': 'Método não permitido'})
         self.wfile.write(error_response.encode('utf-8'))
+
+# Ponto de entrada principal para execução como script CGI
+if __name__ == '__main__':
+    import sys
+    import os
+    
+    # Verificar se está sendo executado como CGI
+    if os.environ.get('REQUEST_METHOD'):
+        try:
+            # Ler dados do stdin
+            content_length = int(os.environ.get('CONTENT_LENGTH', 0))
+            if content_length > 0:
+                post_data = sys.stdin.buffer.read(content_length)
+                data = json.loads(post_data.decode('utf-8'))
+                
+                generator = ContractPDFGenerator()
+                pdf_buffer = generator.generate_contract_pdf(data)
+                
+                # Enviar headers CGI
+                print('Content-Type: application/pdf')
+                print('Content-Disposition: attachment; filename=contrato_veiculo.pdf')
+                print()  # Linha vazia para separar headers do body
+                
+                # Enviar PDF para stdout
+                sys.stdout.buffer.write(pdf_buffer.getvalue())
+            else:
+                print('Content-Type: application/json')
+                print()
+                print(json.dumps({'error': 'Dados não fornecidos'}))
+                
+        except json.JSONDecodeError:
+            print('Content-Type: application/json')
+            print()
+            print(json.dumps({'error': 'JSON inválido'}))
+        except Exception as e:
+            print('Content-Type: application/json')
+            print()
+            print(json.dumps({'error': f'Erro ao gerar PDF: {str(e)}'}))
+    else:
+        print("Este script deve ser executado como CGI ou através do servidor HTTP")
