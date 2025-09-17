@@ -269,8 +269,8 @@ class VehicleContractGenerator {
             
             console.log('Dados enviados para o servidor:', data);
             
-            // Enviar dados para o servidor Flask na porta 8080
-            const response = await fetch('http://localhost:8080/api/generate-pdf', {
+            // Enviar dados para o servidor
+            const response = await fetch('/api/generate-pdf', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

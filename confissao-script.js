@@ -113,7 +113,7 @@ class ConfissaoDividaGenerator {
     generatePDF() {
         const formData = this.getFormData();
         
-        fetch('http://localhost:8080/api/generate_confissao_pdf', {
+        fetch('/api/generate_confissao_pdf', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
