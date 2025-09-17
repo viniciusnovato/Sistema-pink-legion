@@ -5,6 +5,7 @@ class VehicleContractGenerator {
         
         if (this.form) {
             this.initializeEventListeners();
+            this.setupCalculations();
             // Remover setupFormValidation para evitar validação
         }
     }
@@ -13,18 +14,18 @@ class VehicleContractGenerator {
         this.form.addEventListener('submit', (e) => this.handleFormSubmit(e));
         
         // Cálculo automático do valor remanescente
-        const precoTotal = document.getElementById('precoTotal');
-        const sinal = document.getElementById('sinal');
+        const precoVenda = document.getElementById('precoVenda');
+        const sinalPago = document.getElementById('sinalPago');
         const numeroPrestacoes = document.getElementById('numeroPrestacoes');
         
-        if (precoTotal) {
-            precoTotal.addEventListener('input', () => this.calculateRemaining());
+        if (precoVenda) {
+            precoVenda.addEventListener('input', () => this.updateCalculations());
         }
-        if (sinal) {
-            sinal.addEventListener('input', () => this.calculateRemaining());
+        if (sinalPago) {
+            sinalPago.addEventListener('input', () => this.updateCalculations());
         }
         if (numeroPrestacoes) {
-            numeroPrestacoes.addEventListener('input', () => this.calculateInstallment());
+            numeroPrestacoes.addEventListener('input', () => this.updateCalculations());
         }
 
         // Preenchimento automático do campo "Relativamente ao contrato" com o NIF da Empresa
@@ -46,8 +47,6 @@ class VehicleContractGenerator {
         if (clearBtn) {
             clearBtn.addEventListener('click', () => this.clearForm());
         }
-
-        // Gerar PDF
         const generatePDFBtn = document.getElementById('generatePDF');
         if (generatePDFBtn) {
             generatePDFBtn.addEventListener('click', () => this.generatePDF());
@@ -96,79 +95,63 @@ class VehicleContractGenerator {
         e.target.value = value;
     }
 
-    calculateRemaining() {
-        const precoTotal = parseFloat(document.getElementById('precoTotal')?.value) || 0;
-        const sinal = parseFloat(document.getElementById('sinal')?.value) || 0;
-        
-        const valorRemanescente = precoTotal - sinal;
-        
-        const remanescente = document.getElementById('valorRemanescente');
-        if (remanescente) {
-            remanescente.value = valorRemanescente >= 0 ? valorRemanescente.toFixed(2) : '0.00';
+    setupCalculations() {
+        this.updateCalculations();
+    }
+
+    updateCalculations() {
+        const precoVenda = parseFloat(document.getElementById('precoVenda')?.value) || 0;
+        const sinalPago = parseFloat(document.getElementById('sinalPago')?.value) || 0;
+        const numeroPrestacoes = parseInt(document.getElementById('numeroPrestacoes')?.value) || 1;
+
+        const valorRemanescente = precoVenda - sinalPago;
+        const valorPrestacao = valorRemanescente / numeroPrestacoes;
+
+        const valorRemanescenteField = document.getElementById('valorRestante');
+        const valorPrestacaoField = document.getElementById('valorPrestacao');
+
+        if (valorRemanescenteField) {
+            valorRemanescenteField.value = valorRemanescente.toFixed(2);
         }
 
-        // Calcular valor da prestação automaticamente
+        if (valorPrestacaoField) {
+            valorPrestacaoField.value = valorPrestacao.toFixed(2);
+        }
+    }
+
+    calculateRemaining() {
+        const precoVenda = parseFloat(document.getElementById('precoVenda')?.value || '0');
+        const sinalPago = parseFloat(document.getElementById('sinalPago')?.value || '0');
+        
+        const valorRemanescente = precoVenda - sinalPago;
+        
+        const valorRemanescenteField = document.getElementById('valorRestante');
+        if (valorRemanescenteField) {
+            valorRemanescenteField.value = valorRemanescente.toFixed(2);
+        }
+        
+        // Recalcular prestação automaticamente
         this.calculateInstallment();
     }
 
     calculateInstallment() {
-        const valorRemanescente = parseFloat(document.getElementById('valorRemanescente')?.value) || 0;
-        const numeroPrestacoes = parseInt(document.getElementById('numeroPrestacoes')?.value) || 1;
+        const valorRemanescente = parseFloat(document.getElementById('valorRestante')?.value || '0');
+        const numeroPrestacoes = parseInt(document.getElementById('numeroPrestacoes')?.value || '1');
         
-        const valorPrestacao = valorRemanescente / numeroPrestacoes;
-        
-        const prestacao = document.getElementById('valorPrestacao');
-        if (prestacao) {
-            prestacao.value = valorPrestacao >= 0 ? valorPrestacao.toFixed(2) : '0.00';
+        if (numeroPrestacoes > 0) {
+            const valorPrestacao = valorRemanescente / numeroPrestacoes;
+            
+            const valorPrestacaoField = document.getElementById('valorPrestacao');
+            if (valorPrestacaoField) {
+                valorPrestacaoField.value = valorPrestacao.toFixed(2);
+            }
         }
     }
 
     validateField(field) {
-        const value = field.value.trim();
-        let isValid = true;
-        let errorMessage = '';
-
-        // Primeiro verifica se é obrigatório e está vazio
-        if (field.hasAttribute('required') && !value) {
-            isValid = false;
-            errorMessage = 'Este campo é obrigatório';
-        } else if (value) {
-            // Só valida formato se o campo tiver valor
-            switch (field.id) {
-                case 'nifComprador':
-                    isValid = this.isValidNIF(value);
-                    errorMessage = 'NIF deve ter 9 dígitos';
-                    break;
-                case 'matricula':
-                    isValid = this.isValidMatricula(value);
-                    errorMessage = 'Matrícula deve ter formato XX-XX-XX';
-                    break;
-                case 'iban':
-                    isValid = this.isValidIBAN(value);
-                    errorMessage = 'IBAN inválido';
-                    break;
-                case 'chassis':
-                    isValid = this.isValidChassis(value);
-                    errorMessage = 'Chassis deve ter 17 caracteres';
-                    break;
-                case 'anoFabrico':
-                    isValid = this.isValidYear(value);
-                    errorMessage = 'Ano deve estar entre 1900 e ano atual';
-                    break;
-                case 'quilometros':
-                    isValid = this.isValidKilometers(value);
-                    errorMessage = 'Quilómetros deve ser um número positivo';
-                    break;
-            }
-        }
-
-        if (isValid) {
-            this.clearFieldError(field);
-        } else {
-            this.showFieldError(field, errorMessage);
-        }
-
-        return isValid;
+        // Validação removida - permitir qualquer valor nos campos
+        this.clearFieldError(field);
+        return true;
     }
 
     isValidNIF(nif) {
@@ -286,8 +269,8 @@ class VehicleContractGenerator {
             
             console.log('Dados enviados para o servidor:', data);
             
-            // Enviar dados para o servidor
-            const response = await fetch('/api/generate-pdf', {
+            // Enviar dados para o servidor Flask na porta 8080
+            const response = await fetch('http://localhost:8080/api/generate-pdf', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -414,6 +397,8 @@ class VehicleContractGenerator {
             
             const errorFields = this.form.querySelectorAll('.error');
             errorFields.forEach(field => field.classList.remove('error'));
+            
+            this.updateCalculations();
             
             this.showMessage('Formulário limpo com sucesso!', 'info');
         }

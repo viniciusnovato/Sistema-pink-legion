@@ -307,48 +307,16 @@ class ContractGenerator {
             data[key] = value;
         }
         
-        // Validar campos obrigatórios
-        const requiredFields = [
-            'nomeComprador', 'cartaoCidadao', 'nifComprador', 'moradaComprador',
-            'marca', 'modelo', 'matricula', 'chassis', 'cilindrada', 'cor', 'ano', 'quilometros',
-            'precoTotal', 'sinal', 'entradaInicial', 'prestacaoMensal', 'numeroMeses', 'iban',
-            'dataEntrega', 'localEntrega'
-        ];
-        
-        const missingFields = requiredFields.filter(field => !data[field] || data[field].trim() === '');
-        
-        if (missingFields.length > 0) {
-            throw new Error(`Por favor, preencha todos os campos obrigatórios: ${missingFields.join(', ')}`);
-        }
-        
-        // Validar formato de valores numéricos
-        const numericFields = ['precoTotal', 'sinal', 'entradaInicial', 'prestacaoMensal', 'numeroMeses', 'ano', 'quilometros'];
-        for (let field of numericFields) {
-            if (data[field] && isNaN(parseFloat(data[field].replace(',', '.')))) {
-                throw new Error(`O campo ${field} deve conter um valor numérico válido`);
+        // Validações removidas - permitir geração de PDF com campos vazios
+        // Apenas limpar dados vazios para evitar problemas no servidor
+        Object.keys(data).forEach(key => {
+            if (data[key] === null || data[key] === undefined) {
+                data[key] = '';
             }
-        }
+        });
         
-        // Validar formato do NIF (9 dígitos)
-        if (data.nifComprador && !/^\d{9}$/.test(data.nifComprador)) {
-            throw new Error('O NIF deve conter exatamente 9 dígitos');
-        }
-        
-        // Validar formato do IBAN
-        if (data.iban && !/^PT50\d{21}$/.test(data.iban.replace(/\s/g, ''))) {
-            throw new Error('O IBAN deve ter o formato português válido (PT50 seguido de 21 dígitos)');
-        }
-        
-        // Validar data de entrega (não pode ser no passado)
-        if (data.dataEntrega) {
-            const entregaDate = new Date(data.dataEntrega);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            if (entregaDate < today) {
-                throw new Error('A data de entrega não pode ser no passado');
-            }
-        }
+        // Validação de data removida - permitir qualquer data
+        // Data será formatada automaticamente pelo servidor
         
         return data;
     }
@@ -503,46 +471,15 @@ class ContractGenerator {
     }
 
     validateForm() {
-        const inputs = this.form.querySelectorAll('input[required], select[required], textarea[required]');
-        let isValid = true;
-        
-        inputs.forEach(input => {
-            if (!this.validateField(input)) {
-                isValid = false;
-            }
-        });
-        
-        return isValid;
+        // Validação removida - permitir geração de PDF sem validar campos
+        return true;
     }
 
     async handleFormSubmit(e) {
         e.preventDefault();
         
-        if (!this.validateForm()) {
-            alert('Por favor, corrija os erros no formulário antes de gerar o PDF.');
-            return;
-        }
-        
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        
-        try {
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.classList.add('loading');
-            submitBtn.textContent = 'Gerando PDF...';
-            
-            await this.generatePDF();
-            
-        } catch (error) {
-            console.error('Erro ao gerar PDF:', error);
-            alert('Erro ao gerar o PDF. Tente novamente.');
-        } finally {
-            // Reset button state
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('loading');
-            submitBtn.textContent = originalText;
-        }
+        // Gerar PDF diretamente sem validação
+        await this.generatePDF();
     }
 
     async generatePDF() {

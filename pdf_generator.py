@@ -433,10 +433,10 @@ class ContractPDFGenerator:
         clausula2_2 = """2.2. O pagamento será efetuado da seguinte forma:"""
         story.append(Paragraph(clausula2_2, self.styles['ContractText']))
         
-        sinal = self.format_currency(data.get('sinal', '0'))
-        entrada_inicial = self.format_currency(data.get('entradaInicial', '0'))
-        prestacao_mensal = self.format_currency(data.get('prestacaoMensal', '0'))
-        numero_meses = data.get('numeroMeses', '____________')
+        sinal = self.format_currency(data.get('sinalPago', '0'))
+        entrada_inicial = self.format_currency(data.get('valorRestante', '0'))
+        prestacao_mensal = self.format_currency(data.get('valorPrestacao', '0'))
+        numero_meses = data.get('numeroPrestacoes', '____________')
         
         pagamento_a = f"""a) Um sinal no valor de <b>{sinal}</b>, pago na assinatura deste contrato;"""
         story.append(Paragraph(pagamento_a, self.styles['IndentedText']))
@@ -447,7 +447,7 @@ class ContractPDFGenerator:
         pagamento_c = f"""c) O remanescente será pago através de financiamento/transferência bancária em prestações mensais de <b>{prestacao_mensal}</b>, durante <b>{numero_meses} meses</b>."""
         story.append(Paragraph(pagamento_c, self.styles['IndentedText']))
         
-        iban = data.get('iban', '____________________________')
+        iban = data.get('ibanSepa', '____________________________')
         clausula2_3 = f"""2.3. O pagamento será realizado para o <b>IBAN da Vendedora: {iban}</b>."""
         story.append(Paragraph(clausula2_3, self.styles['ContractText']))
         story.append(Spacer(1, 12))
@@ -523,11 +523,11 @@ class ContractPDFGenerator:
             f"Marca: {data.get('marca', '____________')}",
             f"Modelo: {data.get('modelo', '____________')}",
             f"Matrícula: {data.get('matricula', '____________')}",
-            f"Nº de Chassis (VIN): {data.get('chassis', '____________')}",
+            f"Nº de Chassis (VIN): {data.get('numeroQuadro', '____________')}",
             f"Cilindrada: {data.get('cilindrada', '____________')}",
             f"Cor: {data.get('cor', '____________')}",
-            f"Ano: {data.get('ano', '____________')}",
-            f"Quilómetros: {data.get('quilometros', '____________')}"
+            f"Ano: {data.get('anoFabrico', '____________')}",
+            f"Quilómetros: {data.get('quilometragem', '____________')}"
         ]
         
         for item in veiculo_data:
@@ -536,8 +536,7 @@ class ContractPDFGenerator:
         story.append(Spacer(1, 30))
         
         # Data e local
-        data_atual = datetime.now().strftime("%d de %B de %Y")
-        story.append(Paragraph(f"Feito em duplicado, em ____________, aos {data_atual}.", self.styles['ContractText']))
+        story.append(Paragraph("Maia, ____________", self.styles['ContractText']))
         story.append(Spacer(1, 20))
         
         # Assinaturas
@@ -778,7 +777,7 @@ def confissao_script():
     except FileNotFoundError:
         return "Script não encontrado", 404
 
-@app.route('/generate-pdf', methods=['POST'])
+@app.route('/api/generate-pdf', methods=['POST'])
 def generate_pdf():
     try:
         data = request.get_json()
@@ -802,7 +801,7 @@ def generate_pdf():
         print(f"Erro ao gerar PDF: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/generate_confissao_pdf', methods=['POST'])
+@app.route('/api/generate_confissao_pdf', methods=['POST'])
 def generate_confissao_pdf():
     try:
         data = request.get_json()

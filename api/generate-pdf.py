@@ -1,27 +1,22 @@
-from flask import request, jsonify, Response
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import cm
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.lib.units import mm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
-import json
-import os
-from datetime import datetime
-import tempfile
-import io
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from io import BytesIO
 import hashlib
+import json
 
-# Patch completo para hashlib.md5 - remove usedforsecurity
-_original_md5 = hashlib.md5
-
-def _patched_md5(*args, **kwargs):
-    # Remove o parâmetro usedforsecurity se presente
+# Patch para hashlib.md5 para compatibilidade com Python 3.9+
+original_md5 = hashlib.md5
+def patched_md5(*args, **kwargs):
     kwargs.pop('usedforsecurity', None)
-    return _original_md5(*args, **kwargs)
-
-# Substitui a função md5 globalmente
-hashlib.md5 = _patched_md5
+    return original_md5(*args, **kwargs)
+hashlib.md5 = patched_md5
 
 class ContractPDFGenerator:
     def __init__(self):
@@ -207,25 +202,53 @@ class ContractPDFGenerator:
         except:
             return date_string
 
-def handler(req):
-    if req.method == 'POST':
+from http.server import BaseHTTPRequestHandler
+import json
+
+class handler(BaseHTTPRequestHandler):
+    def do_POST(self):
         try:
-            data = req.get_json()
-            if not data:
-                return jsonify({'error': 'Dados não fornecidos'}), 400
+            # Ler dados do corpo da requisição
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length == 0:
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                error_response = json.dumps({'error': 'Dados não fornecidos'})
+                self.wfile.write(error_response.encode('utf-8'))
+                return
+            
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
             
             generator = ContractPDFGenerator()
             pdf_buffer = generator.generate_contract_pdf(data)
             
-            return Response(
-                pdf_buffer.getvalue(),
-                mimetype='application/pdf',
-                headers={
-                    'Content-Disposition': 'attachment; filename=contrato_veiculo.pdf',
-                    'Content-Type': 'application/pdf'
-                }
-            )
+            # Enviar resposta
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/pdf')
+            self.send_header('Content-Disposition', 'attachment; filename=contrato_veiculo.pdf')
+            self.end_headers()
+            
+            # Enviar PDF
+            self.wfile.write(pdf_buffer.getvalue())
+            
+        except json.JSONDecodeError:
+            self.send_response(400)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            error_response = json.dumps({'error': 'JSON inválido'})
+            self.wfile.write(error_response.encode('utf-8'))
         except Exception as e:
-            return jsonify({'error': f'Erro ao gerar PDF: {str(e)}'}), 500
-    else:
-        return jsonify({'error': 'Método não permitido'}), 405
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            error_response = json.dumps({'error': f'Erro ao gerar PDF: {str(e)}'})
+            self.wfile.write(error_response.encode('utf-8'))
+    
+    def do_GET(self):
+        self.send_response(405)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        error_response = json.dumps({'error': 'Método não permitido'})
+        self.wfile.write(error_response.encode('utf-8'))
