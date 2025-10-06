@@ -2,10 +2,5 @@
   "buildCommand": "cd pink-legion-web && npm run build",
   "outputDirectory": "pink-legion-web/.next",
   "installCommand": "cd pink-legion-web && npm install",
-  "framework": "nextjs",
-  "functions": {
-    "pink-legion-web/src/app/api/**/route.ts": {
-      "maxDuration": 30
-    }
-  }
+  "framework": "nextjs"
 }
