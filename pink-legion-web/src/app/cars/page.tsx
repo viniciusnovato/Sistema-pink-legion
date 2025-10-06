@@ -244,6 +244,7 @@ export default function CarsPage() {
             </Button>
             <Button
               onClick={() => router.push('/dashboard/cars/new')}
+              className="bg-pink-600 hover:bg-pink-700 text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               Novo Carro
@@ -305,7 +306,7 @@ export default function CarsPage() {
                   }
                 </p>
                 {cars.length === 0 && (
-                  <Button onClick={() => router.push('/dashboard/cars/new')}>
+                  <Button onClick={() => router.push('/dashboard/cars/new')} className="bg-pink-600 hover:bg-pink-700 text-white">
                     <Plus className="h-4 w-4 mr-2" />
                     Adicionar Primeiro Carro
                   </Button>

@@ -215,7 +215,7 @@ export default function CarsPage() {
               Gerencie o inventário de veículos da Pink Legion
             </p>
           </div>
-          <Button onClick={() => router.push('/dashboard/cars/new')} className="shrink-0">
+          <Button onClick={() => router.push('/dashboard/cars/new')} className="shrink-0 bg-pink-600 hover:bg-pink-700 text-white">
             <Plus className="h-4 w-4 mr-2" />
             Adicionar Carro
           </Button>
@@ -414,7 +414,7 @@ export default function CarsPage() {
                 <p className="text-text-secondary-light dark:text-text-secondary-dark mb-4">
                   Tente ajustar os filtros ou adicione um novo carro.
                 </p>
-                <Button onClick={() => router.push('/dashboard/cars/new')}>
+                <Button onClick={() => router.push('/dashboard/cars/new')} className="bg-pink-600 hover:bg-pink-700 text-white">
                   <Plus className="h-4 w-4 mr-2" />
                   Adicionar Primeiro Carro
                 </Button>

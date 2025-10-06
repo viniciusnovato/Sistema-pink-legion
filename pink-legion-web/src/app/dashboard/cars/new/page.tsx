@@ -26,10 +26,9 @@ export default function NewCarPage() {
     mileage: 0,
     color: '',
     engine: '',
-    price: '',
     purchase_price: '',
     sale_price: '',
-    status: 'disponivel' as 'disponivel' | 'vendido' | 'reservado',
+    status: 'available',
     notes: ''
   })
 
@@ -45,6 +44,12 @@ export default function NewCarPage() {
     setSaving(true)
 
     try {
+      // Validar e converter campos numéricos
+      const year = formData.year && !isNaN(formData.year) ? formData.year : new Date().getFullYear()
+      const mileage = formData.mileage && !isNaN(formData.mileage) ? formData.mileage : 0
+      const purchase_price = formData.purchase_price && formData.purchase_price.trim() !== '' ? formData.purchase_price : null
+      const sale_price = formData.sale_price && formData.sale_price.trim() !== '' ? formData.sale_price : null
+
       const { error } = await supabase
         .from('cars')
         .insert([{
@@ -52,13 +57,12 @@ export default function NewCarPage() {
           model: formData.model,
           license_plate: formData.license_plate,
           vin: formData.vin || null,
-          year: formData.year,
-          mileage: formData.mileage,
+          year: year,
+          mileage: mileage,
           color: formData.color,
           engine: formData.engine,
-          price: formData.price,
-          purchase_price: formData.purchase_price || null,
-          sale_price: formData.sale_price || null,
+          purchase_price: purchase_price,
+          sale_price: sale_price,
           status: formData.status,
           notes: formData.notes || null
         }])
@@ -171,7 +175,7 @@ export default function NewCarPage() {
                       <Input
                         type="number"
                         value={formData.year}
-                        onChange={(e) => handleInputChange('year', parseInt(e.target.value))}
+                        onChange={(e) => handleInputChange('year', e.target.value ? parseInt(e.target.value) : '')}
                         min="1900"
                         max={new Date().getFullYear() + 1}
                         required
@@ -185,7 +189,7 @@ export default function NewCarPage() {
                       <Input
                         type="number"
                         value={formData.mileage}
-                        onChange={(e) => handleInputChange('mileage', parseInt(e.target.value))}
+                        onChange={(e) => handleInputChange('mileage', e.target.value ? parseInt(e.target.value) : '')}
                         min="0"
                         placeholder="Ex: 50000"
                         required
@@ -227,7 +231,7 @@ export default function NewCarPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark mb-2">
                         Preço de Compra (€)
@@ -259,7 +263,6 @@ export default function NewCarPage() {
                         Preço para venda do veículo
                       </p>
                     </div>
-
 
                   </div>
                 </CardContent>
