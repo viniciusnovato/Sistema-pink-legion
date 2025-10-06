@@ -67,12 +67,12 @@ export default function ClientsPage() {
     
     return () => {
       endMeasure();
-      // Gerar relatório de performance
+      // Gerar relatório de performance apenas uma vez
       setTimeout(() => {
         generateReport();
       }, 1000);
     };
-  }, [measureComponent, generateReport]);
+  }, []); // Removendo as dependências que causavam o loop
 
   useEffect(() => {
     if (user) {
@@ -212,7 +212,7 @@ export default function ClientsPage() {
     setShowDeleteModal(true);
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | null) => {
     switch (status) {
       case 'active':
         return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
@@ -227,7 +227,7 @@ export default function ClientsPage() {
     }
   };
 
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = (status: string | null) => {
     switch (status) {
       case 'active':
         return 'Ativo';
@@ -238,7 +238,7 @@ export default function ClientsPage() {
       case 'blocked':
         return 'Bloqueado';
       default:
-        return status;
+        return status || 'Indefinido';
     }
   };
 
