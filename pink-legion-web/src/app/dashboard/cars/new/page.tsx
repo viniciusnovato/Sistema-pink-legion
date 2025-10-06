@@ -28,7 +28,7 @@ export default function NewCarPage() {
     engine: '',
     purchase_price: '',
     sale_price: '',
-    status: 'available',
+    status: 'disponivel',
     notes: ''
   })
 
