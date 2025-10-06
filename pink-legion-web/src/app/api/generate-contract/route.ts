@@ -2,7 +2,8 @@ import { NextRequest } from 'next/server'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 import path from 'path'
 import fs from 'fs/promises'
 import { getBicByIban } from '@/lib/portuguese-banks'
@@ -237,22 +238,24 @@ export async function POST(req: NextRequest) {
     const html = applyPlaceholders(template, data, type)
 
     const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox', 
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu',
-        '--disable-web-security',
-        '--disable-features=VizDisplayCompositor'
-      ],
+      args: process.env.NODE_ENV === 'production' 
+        ? [...chromium.args, '--hide-scrollbars', '--disable-web-security']
+        : [
+          '--no-sandbox', 
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
+          '--disable-gpu',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor'
+        ],
       executablePath: process.env.NODE_ENV === 'production' 
-        ? '/usr/bin/google-chrome-stable' 
-        : undefined
+        ? await chromium.executablePath() 
+        : undefined,
+      headless: true
     })
     const page = await browser.newPage()
     await page.setContent(html, { waitUntil: 'networkidle0' })
