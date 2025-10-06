@@ -19,7 +19,8 @@ interface Car {
   mileage: number
   color: string
   engine: string
-  price: string
+  purchase_price?: number
+  sale_price?: number
   status: 'disponivel' | 'vendido' | 'reservado'
   notes?: string
   created_at: string
@@ -45,7 +46,8 @@ export default function CarsPage() {
     mileage: 0,
     color: '',
     engine: '',
-    price: '',
+    purchase_price: '',
+    sale_price: '',
     status: 'disponivel' as 'disponivel' | 'vendido' | 'reservado',
     notes: ''
   })
@@ -131,7 +133,8 @@ export default function CarsPage() {
       mileage: 0,
       color: '',
       engine: '',
-      price: '',
+      purchase_price: '',
+      sale_price: '',
       status: 'disponivel',
       notes: ''
     })
@@ -149,7 +152,8 @@ export default function CarsPage() {
       mileage: car.mileage,
       color: car.color,
       engine: car.engine,
-      price: car.price,
+      purchase_price: car.purchase_price?.toString() || '',
+      sale_price: car.sale_price?.toString() || '',
       status: car.status,
       notes: car.notes || ''
     })
@@ -366,10 +370,10 @@ export default function CarsPage() {
 
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                    {parseFloat(car.price).toLocaleString('pt-PT', {
+                    {car.sale_price ? parseFloat(car.sale_price.toString()).toLocaleString('pt-PT', {
                       style: 'currency',
                       currency: 'EUR'
-                    })}
+                    }) : 'Preço não definido'}
                   </span>
                 </div>
 
@@ -475,9 +479,14 @@ export default function CarsPage() {
                   onChange={(e) => setFormData({ ...formData, engine: e.target.value })}
                 />
                 <Input
-                  placeholder="Preço"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  placeholder="Preço de Compra"
+                  value={formData.purchase_price}
+                  onChange={(e) => setFormData({ ...formData, purchase_price: e.target.value })}
+                />
+                <Input
+                  placeholder="Preço de Venda"
+                  value={formData.sale_price}
+                  onChange={(e) => setFormData({ ...formData, sale_price: e.target.value })}
                 />
                 <select
                   value={formData.status}
@@ -568,9 +577,14 @@ export default function CarsPage() {
                   onChange={(e) => setFormData({ ...formData, engine: e.target.value })}
                 />
                 <Input
-                  placeholder="Preço"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  placeholder="Preço de Compra"
+                  value={formData.purchase_price}
+                  onChange={(e) => setFormData({ ...formData, purchase_price: e.target.value })}
+                />
+                <Input
+                  placeholder="Preço de Venda"
+                  value={formData.sale_price}
+                  onChange={(e) => setFormData({ ...formData, sale_price: e.target.value })}
                 />
                 <select
                   value={formData.status}

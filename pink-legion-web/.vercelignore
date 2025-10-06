@@ -48,4 +48,7 @@ out/
 
 # Supabase local files
 supabase/.branches
+
+# Keep Chrome binary for Puppeteer
+!node_modules/puppeteer/.local-chromium/
 supabase/.temp

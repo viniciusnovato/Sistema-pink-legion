@@ -13,7 +13,8 @@ interface Car {
   brand: string;
   model: string;
   year: number;
-  price: number;
+  purchase_price: number;
+  sale_price: number;
   mileage: number;
   fuel_type: string;
   transmission: string;
@@ -340,7 +341,7 @@ export default function CarsPage() {
                         </TableCell>
                         <TableCell>{car.year}</TableCell>
                         <TableCell className="font-medium">
-                          {formatPrice(car.price)}
+                          {formatPrice(car.sale_price)}
                         </TableCell>
                         <TableCell>
                           {car.mileage.toLocaleString('pt-PT')} km

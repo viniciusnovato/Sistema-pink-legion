@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 import puppeteer from 'puppeteer'
 import path from 'path'
 import fs from 'fs/promises'
@@ -237,7 +238,21 @@ export async function POST(req: NextRequest) {
 
     const browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor'
+      ],
+      executablePath: process.env.NODE_ENV === 'production' 
+        ? '/usr/bin/google-chrome-stable' 
+        : undefined
     })
     const page = await browser.newPage()
     await page.setContent(html, { waitUntil: 'networkidle0' })
