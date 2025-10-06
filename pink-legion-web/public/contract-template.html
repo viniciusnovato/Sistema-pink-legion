@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrato de Compra e Venda com Reserva de Propriedade</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 20px;
+            color: #000;
+        }
+        
+        .header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin: 20px 0 10px 0;
+            text-transform: uppercase;
+        }
+        
+        .clause {
+            margin: 15px 0;
+            text-align: justify;
+        }
+        
+        .clause-title {
+            font-weight: bold;
+            display: inline;
+        }
+        
+        .parties {
+            margin: 20px 0;
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        
+        .signature-line {
+            border-bottom: 1px solid #000;
+            width: 300px;
+            margin: 20px 0;
+            display: inline-block;
+        }
+        
+        .authorization-section {
+            margin-top: 50px;
+            border-top: 2px solid #000;
+            padding-top: 20px;
+            /* evitar quebra no meio da autorização */
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        
+        .creditor-debtor {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .creditor, .debtor {
+            width: 45%;
+        }
+        
+        @media print {
+            body {
+                margin: 15px;
+            }
+            /* compactar espaçamentos para caber a assinatura na página anterior */
+            .section-title { margin: 12px 0 6px 0; }
+            .clause { margin: 10px 0; }
+            .signature-section { page-break-before: avoid; page-break-after: avoid; }
+            /* forçar que a autorização de débito direto seja uma página única separada */
+            .authorization-section { page-break-before: always; }
+        }
+        
+        .highlight {
+            font-weight: bold;
+        }
+        
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        li {
+            margin: 5px 0;
+        }
+    </style>
+}</head>
+<body>
+    <div class="header">
+        Contrato de Compra e Venda com Reserva de Propriedade
+    </div>
+
+    <div class="section-title">Das Partes</div>
+    
+    <div class="parties">
+        <p><span class="highlight">VENDEDOR(A):</span> PINKLEGION – UNIPESSOAL, LDA, pessoa coletiva, inscrita com o NIPC nº 518899586, com sede à Rua do Bacelo, nº 266, Código Postal nº 4475 325, Milheirós, Maia – Portugal, através de seu representante legal com os poderes para o acto, doravante denominado Vendedor(a); e</p>
+        
+        <p><span class="highlight">COMPRADOR(A):</span> {{full_name}}, {{nif}}, residente em {{address}}, {{nationality}}, doravante denominado Comprador(a).</p>
+        
+        <p>O presente pacto será regido pelo Decreto-Lei nº 181/2012 de 20 de Junho, pelo artigo 409º do Código Civil Português (reserva de propriedade), em consonância com as demais Leis do ordenamento jurídico português.</p>
+    </div>
+
+    <div class="section-title">Do Objeto do Contrato</div>
+    
+    <div class="clause">
+  <span class="clause-title">Cláusula 1ª.</span> O presente contrato tem por objeto o aluguel com opção de compra de 01 (uma) viatura automóvel da marca <span class="highlight">{{brand}}</span>, modelo <span class="highlight">{{model}}</span>, ano de fabrico <span class="highlight">{{year}}</span>, cor <span class="highlight">{{color}}</span>, identificada pelo número de quadro <span class="highlight">{{vin}}</span>, com matrícula <span class="highlight">{{license_plate}}</span>.
+    </div>
+
+    <div class="section-title">DA RESERVA DE PROPRIEDADE/DOMÍNIO</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 2º.</span> Fica reservado ao (a) VENDEDOR(A), conforme o disposto neste Contrato, a propriedade do bem objeto deste instrumento, nos termos do Art. 409ª do Código Civil, até serem pagas todas as parcelas pelo(a) COMPRADOR(A).
+    </div>
+
+    <div class="section-title">DA CONSERVAÇÃO E USO DO BEM</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 3ª.</span> Nos termos do Art. 562º do Código Civil, em caso de qualquer sinistro, avaria ou inutilização do bem, o(a) COMPRADOR(A) ficará responsável em assistência técnica/oficina autorizada pelo fabricante ou indicada pelo VENDEDOR, ou o pagamento do valor integral do bem, objeto da cláusula 1ª.
+    </div>
+
+    <div class="section-title">DA   UTILIZAÇÃO   EXCLUSIVA   DO(A)   COMPRADOR(A)</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 4ª.</span> O bem somente poderá ser utilizado, EXCLUSIVAMENTE pelo(a)COMPRADOR(A), ou por Terceiros devidamente autorizados expressamente e porescrito pelo VENDEDOR(A).
+    </div>
+
+    <div class="section-title">Do Preço</div>
+    
+    <div class="clause">
+        <span class="clause-title">Cláusula 5ª.</span> O(A) COMPRADOR(A) pagará ao(à) VENDEDOR(A) o valor global de <span class="highlight">€ {{total_amount}} ({{total_amount_text}})</span>, da seguinte maneira:
+        <ul>
+            <li>01 (uma) entrada de <span class="highlight">€ {{down_payment}} ({{down_payment_text}})</span>; e</li>
+            <li>O restante, em <span class="highlight">{{installments}}</span> parcelas mensais e sucessivas, com vencimento da primeira em <span class="highlight">{{first_payment_date}}</span>.</li>
+        </ul>
+        
+  <p><span class="highlight">§1º.</span> Os pagamentos serão realizados mediante <span class="highlight">{{payment_method}}</span>, para o IBAN do(a) VENDEDOR(A), qual seja: <span class="highlight">PT50 0035 0196 00031190330 59</span>.</p>
+        
+        <p><span class="highlight">§2º:</span> O(A) VENDEDOR poderá aderir à plataformas de pagamentos através de débitos direitos dos respetivos valores e datas pactuados, cabendo ao(a) COMPRADOR(A) informar os dados ban</p>
+    </div>
+
+    <div class="section-title">Da Vigência</div>
+    
+    <div class="clause">
+        <span class="clause-title">Cláusula 6ª.</span> O presente contrato terá vigência de <span class="highlight">{{installments}} meses</span>, mesmo período referente às parcelas vincendas.
+    </div>
+
+    <div class="section-title">DA GARANTIA</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 7ª:</span> O objeto do contrato terá GARANTIA de bom funcionamento pelo período de 18(DEZOITO) MESES dada pelo(a) VENDEDOR(A), a partir da data de entrega do bem, nos termos do Decreto-Lei nº 84/2021, desde que atendidas todas as recomendações previstas pelo fabricante e VENDEDOR(A), especialmente, mas não limitadas, as previstas neste.
+    </div>
+
+    <div class="section-title">DA RESCISÃO ANTECIPADA E DEVOLUÇÃO DO BEM</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 8ª.</span> Caso o(a) COMPRADOR(A) desista do contrato durante a vigência deste, deverá proceder à IMEDIATA devolução da viatura ao VENDEDOR (A) nas mesmas condições das quais recebeu.
+    </div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 9ª.</span> A desistência por parte do(a) COMPRADOR(A) exime completa e absolutamente, de forma irrevogável e irretratável, o(a) VENDEDOR(A) da devolução de quaisquer valores recebidos durante o curso deste pacto, seja de qual natureza for dando geral e irrestrita quitação, restando os valores convertidos em benefício do(a) VENDEDOR(A), pelo uso do bem pelo(a) COMPRADOR(A), durante a vigência deste.
+    </div>
+
+    <div class="section-title">UTILIZAÇÃO E MANUTENÇÃO ‒ RESPONSABILIDADES DO(A) COMPRADOR(A)</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 10ª.</span> O(A) COMPRADOR(A) obriga-se a:
+        <ul>
+            <li>I. Utilizar​o veículo com prudência, respeitando todas as normas legais e recomendações do fabricante;</li>
+            <li>II. Efetuar, por sua conta, toda a manutenção preventiva e corretiva, exclusivamente em oficinas indicadas pelo(a) VENDEDOR(A);
+            </li>
+            <li>III. Assegurar que o veículo se mantém em perfeitas condições de funcionamento e segurança;</li>
+            <li>IV. Comunicar imediatamente ao(a) VENDEDOR(A) qualquer avaria, defeito ou incidente que afete o bem;</li>
+            <li>V. Contratar Seguro Integral que abranja danos próprios e contra terceiros, sob pena de somente conseguir utilizar o veículo após o cumprimento de tal obrigação.</li>
+        </ul>
+    </div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 11ª.</span> Nos termos do artigo 562º do Código Civil, em caso de qualquer sinistro, avaria, inutilização do bem, o COMPRADOR(A)ficará responsável por custear a reparação/conserto em oficina/assistência técnica autorizada ou apontada pelo VENDEDOR(A), pagando integralmente os respetivos valores, ou indemnizar no valor total do bem descrito na Cláusula 1ª.
+    </div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 12ª.</span> O(A) COMPRADOR(A) assume integral responsabilidade por todas as multas, coimas, portagens, impostos, taxas e demais encargos resultantes da utilização do veículo, nos termos da alínea d) do nº 7 do Art. 9º do Decreto-Lei nº 181/2012, e do Art. 562º do Código Civil, devendo realizar os pagamentos destas, dentro dos respetivos prazos estabelecidos, sob pena de ser acrescido o percentual 20% (vinte por cento) com base nos valores a título de reparação, sem prejuízo de eventuais honorários advocatórios, desde já arbitrados em 10% (dez por cento), taxas judiciárias, e demais encargos pertinentes.
+    </div>
+
+    <div class="section-title">REPOSIÇÃO DE PEÇAS E ACESSÓRIOS</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 13ª.</span> Qualquer peça, componente ou acessório do veículo que venha a necessitar de substituição durante a vigência do contrato deverá ser reposto por outro original do fabricante ou equivalente de qualidade certificada, às expensas do COMPRADOR(A), devendo a substituição ser previamente autorizada por escrito pelo VENDEDOR(A).
+    </div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 14ª.</span> A instalação ou utilização de peças ou acessórios não autorizados, de qualidade inferior ou que não respeitem as especificações técnicas do fabricante constitui incumprimento contratual grave, responsabilizando o(a) COMPRADOR(A) por todos os danos diretos e indiretos que daí possam resultar, incluindo a perda de garantias, desvalorização do veículo e eventuais prejuízos sofridos pelo(a) VENDEDOR(A).
+    </div>
+
+    <div class="section-title">INCUMPRIMENTO – INADIMPLEMENTO</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 15ª.</span> Constitui incumprimento contratual, para todos os efeitos legais, qualquer atraso ou inadimplemento no pagamento das prestações/parcelas correspondente a três semanas/meses consecutivas ou quatro semanas/meses interpoladas ao longo da vigência do contrato.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 16ª.</span> A utilização do veículo de forma contrária à lei ou em desacordo com as condições estabelecidas no presente instrumento; a omissão na realização das manutenções obrigatórias determinadas pelo(a) VENDEDOR(A); bem como a prática de quaisquer atos dolosos ou culposos, que causem danos ao veículo, comprometam a sua segurança ou reduzam o seu valor comercial.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 17ª.</span> Em caso de incumprimento contratual por parte do(a) COMPRADOR(A), o(a) VENDEDOR(A) poderá, de imediato, DENUNCIAR o presente contrato.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 18ª.</span> Em caso de Denúncia do Contrato deverá o(a) COMPRADOR(A) promover a IMEDIATA DEVOLUÇÃO DO BEM ao(a) VENDEDOR(A).
+    </div>
+    <div class="clause">
+        <span class="clause-title">§ ÚNICO.</span> Caso o(a) COMPRADOR(A) reste omisso quanto a esta obrigação, o(a) VENDEDOR(A) poderá proceder diligências destinadas à IMEDIATA recolha do veículo, sem prejuízo de eventual responsabilização administrativa, cível e criminal.
+    </div>
+
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 19ª.</span> O(a) VENDEDOR(A) poderá ainda reter a título de Cláusula Penal os valores pagos até o evento, sem prejuízo de exigir do(a) COMPRADOR(A) os valores que extrapolem, correspondentes à devida indemnização por quaisquer danos ou prejuízos, diretos ou indiretos, que o bem tenha sofrido em consequência do referido incumprimento.
+    </div>
+
+    <div class="section-title">Rescisão por Utilização Ilícita</div>
+    
+    <div class="clause">
+        <span class="clause-title">Cláusula 20ª.</span> O(A) VENDEDOR(A) poderá rescindir imediatamente o presente contrato, sem necessidade de aviso prévio ou compensação, caso seja apurado que o veículo foi utilizado, pelo(a) COMPRADOR(A) ou por Terceiros desautorizados, para a prática de contravenções, atos ilícitos, crimes, ou quaisquer atividades proibidas por lei, sem prejuízo da aplicação das demais cláusulas penais.
+    </div>
+
+    <div class="section-title">Obrigações em Caso de Roubo, Furto, Perda Total ou Danos Graves</div>
+    
+    <div class="clause">
+        <span class="clause-title">Cláusula 21ª.</span> No caso de ocorrência de qualquer sinistro, especialmente roubo, furto, perda total ou danos de tal gravidade que impeçam a utilização segura e regular do veículo, o(a) COMPRADOR (A) obriga-se a liquidar, de forma antecipada e integral, todas as prestações vincendas até ao final do prazo contratual, considerando-se para todos os efeitos que o contrato foi cumprido até ao seu termo.
+        <p><span class="highlight">§ ÚNICO.</span> Para efeitos desta cláusula, considera-se "perda total" qualquer situação em que, por avaliação técnica ou pericial, seja constatado que o custo da reparação excede o valor de mercado do veículo à data do sinistro.</p>
+    </div>
+    
+    <div class="clause">
+        <span class="clause-title">Cláusula 22ª.</span> O pagamento antecipado deverá ser efetuado no prazo máximo e improrrogável de 10 (dez) dias úteis após notificação escrita do(a) VENDEDOR(A), sem prejuízo da responsabilidade do(a) COMPRADOR(A) por eventuais encargos adicionais decorrentes do evento.
+    </div>
+
+    <div class="section-title">Comunicação de Sinistros</div>
+    
+    <div class="clause">
+        <span class="clause-title">Cláusula 23ª.</span> O(a) COMPRADOR(A) obriga-se a comunicar ao COMPRADOR(A), por escrito e no prazo máximo de 24 (vinte e quatro) horas, qualquer sinistro, acidente, dano, roubo, furto, perda total ou ocorrência que afete o veículo objeto deste contrato, devendo fornecer todas as informações e documentos necessários à participação do sinistro junto das autoridades e, se aplicável, da seguradora.
+    </div>
+
+    <div class="section-title">Confissão de Dívida</div>
+    
+    <div class="clause">
+        <span class="clause-title">Cláusula 24ª.</span> Para todos os efeitos legais, o(a) COMPRADOR(A), ao assinar o presente contrato, reconhece e confessa, desde já, que, no caso de ocorrência de sinistro que implique o pagamento antecipado das prestações vincendas, conforme estipulado neste instrumento, o valor correspondente constituirá dívida líquida, certa e exigível, passível de cobrança judicial imediata, acrescida de juros e encargos legais, e honorários advocatícios desde já arbitrados em 10% (dez por cento).
+    </div>
+
+    <div class="section-title">Em Caso de Indemnização de Seguradora</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 25ª.</span> Caso o(a) VENDEDOR(A) venha a receber indemnização de seguradora, valor resultante da venda do veículo recuperado ou qualquer outra compensação financeira, esta será deduzida ao montante devido pelo(a) COMPRADOR(A).
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 26ª.</span> Se o valor obtido for inferior ao total da dívida apurada, o LOCATÁRIO ainda restará obrigado, nos termos do Art. 562º do Código Civil a arcar e liquidar a diferença remanescente, no prazo máximo de 10 (dez) dias úteis, contados a partir da comunicação escrita para o efeito.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 27ª.</span> O(A) COMPRADOR(A) permanece igualmente responsável pelo pagamento de quaisquer despesas administrativas, honorários, taxas, custas judiciais e demais encargos que o VENDEDOR(A) venha a suportar em virtude do sinistro, até à resolução final da situação.
+    </div>
+
+    <div class="section-title">Proibição de Cessão e Subarrendamento</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 28ª.</span> É expressamente vedada a Cessão da posição contratual do(a) COMPRADOR(A), sob pena de rescisão imediata e responsabilização nos termos deste pacto.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 29ª.</span> É expressamente proibido ao(a) COMPRADOR(A) ceder, emprestar, locar, a título oneroso ou gratuito, o bem, conforme preconiza a natureza deste contrato.
+    </div>
+
+    <div class="section-title">Estado e Devolução do Veículo</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 30ª.</span> No termo do presente contrato, caso o(a) COMPRADOR(A) opte pela devolução antecipada do veículo, este obriga-se a devolver o veículo ao VENDEDOR (A) no mesmo estado de conservação, funcionamento e aparência em que o recebeu na data de entrega.
+        <p><span class="highlight">§ ÚNICO.</span> Isto compreende, inclusive, o tanque de combustível no estado em que foi entregue, sob pena de aplicação de uma coima de € 100,00 (cem euros) correspondentes a uma taxa administrativa de serviço e a aquisição do combustível.</p>
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 31ª.</span> A devolução deverá ser acompanhada de todos os documentos, chaves, equipamentos, acessórios e demais componentes entregues inicialmente conforme Auto de Vistoria, incluindo, se aplicável, o comprovativo de realização das manutenções obrigatórias no período contratual.
+        <p><span class="highlight">§ ÚNICO.</span> O atraso na devolução da viatura acarretará uma coima arbitrada em € 50,00 (cinquenta euros) por dia de atraso, sem prejuízo da aplicação das demais sanções.</p>
+    </div>
+
+    <div class="section-title">Do Termo de Vistoria</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 32ª.</span> O VENDEDOR(A) procederá a uma inspeção minuciosa do veículo no ato da entrega, bem como da devolução, elaborando um Termo de Vistoria com o registo fotográfico e escrito do estado geral da viatura, que será assinado por ambas as partes.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 33ª.</span> Qualquer dano, avaria, falta de componentes ou ausência de documentos que exceda o desgaste normal de uso será considerado de responsabilidade do LOCATÁRIO, que deverá suportar os custos de reparação ou substituição, acrescidos de eventuais despesas administrativas e imobilização do veículo.
+    </div>
+
+    <div class="section-title">Alterações ao Contrato</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 34ª.</span> Qualquer modificação, aditamento ou alteração ao presente contrato apenas será válida se reduzida a escrito e assinada por ambas as partes, passando a constituir parte integrante deste instrumento, mediante Adenda.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 35ª.</span> Nenhuma tolerância, omissão ou atraso de qualquer das partes no exercício de direitos ou faculdades que lhe assistam por força deste contrato constituirá novação ou renúncia a esses direitos, nem afetará o seu posterior exercício.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 36ª.</span> Todas as condições aqui estabelecidas mantêm-se plenamente em vigor, salvo se alteradas nos termos deste número, considerando-se que cada cláusula possui igual relevância para a execução e validade do presente contrato.
+    </div>
+
+    <div class="section-title">Comunicações</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 37ª.</span> Todas as comunicações entre as partes deverão ser efetuadas por escrito e enviadas através de carta registada com aviso de receção, para as moradas indicadas no presente contrato, ou para outra morada que venha a ser comunicada por escrito pela parte interessada, com antecedência mínima de 15 (quinze) dias.
+    </div>
+    
+    <div class="clause">
+        <span class="clause-title">Cláusula 38ª.</span> Contato do(a) VENDEDOR(A):
+        <ul>
+            <li>Endereço: {{seller_address}}</li>
+  
+        </ul>
+    </div>
+
+    <div class="section-title">DA PROPRIEDADE INTELECTUAL</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 39ª.</span> São exclusivamente do(a) VENDEDOR(A) a titularidade dos direitos de propriedade intelectual sobre o modelo de negócio abrangido por este Contrato, incluindo nomeadamente, mas não exclusivamente, os documentos, estratégias, metodologias e processos aplicados.
+    </div>
+    <div class="clause">
+        <span class="clause-title">§ ÚNICO.</span> No caso de violação ao Direito de Propriedade, o LOCATÁRIO restará obrigado a indemnizá-lo, portanto, deverá suportar todas as consequências administrativas, cíveis, criminais, e em especial, nomeadamente as quantias que tenha de pagar, seja a que título for.
+    </div>
+
+    <div class="section-title">DO SIGILO E CONFIDENCIALIDADE</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 40ª.</span> Para efeitos deste contrato, consideram-se todas as informações contidas neste pacto, e demais dados, informações intrínsecas a este, como "Informações Confidenciais e Sigilosas".
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 41ª.</span> As PARTES garantirão o sigilo absoluto quanto a todas as informações de que, no âmbito do Contrato venham a ter conhecimento, relativo a todo o tipo de funções, atividades, processos, documentos, regras e procedimentos internos designadamente, os dados relativos a processos e outro expediente, seja qual for a sua natureza, e toda a informação constante das bases de dados ou ficheiros a que tenham que aceder.
+        <p><span class="highlight">§1º.</span> O dever de sigilo mantém-se em vigor após a extinção das obrigações decorrentes do contrato, sem prejuízo da sujeição subsequente a quaisquer deveres legais relativos, designadamente, à proteção de segredos comerciais ou da credibilidade, do prestígio ou da confiança devidos às pessoas coletivas.</p>
+        <p><span class="highlight">§2º.</span> Nenhum documento ou dado a que o(a) COMPRADOR(A) tenha acesso, direto ou indiretamente, no âmbito do contrato poderá ser reproduzido sem autorização expressa e escrita do(a) VENDEDOR(A).</p>
+    </div>
+
+    <div class="section-title">Do Foro e Legislação Aplicável</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 42ª.</span> Para dirimir quaisquer questões oriundas do presente contrato, as partes elegem o foro da comarca onde se situa a sede do(a) VENDEDOR(A), renunciando a qualquer outro, por mais privilegiado que seja.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 43ª.</span> O presente contrato rege-se pela legislação portuguesa, nomeadamente pelo Código Civil, Decreto-Lei nº 181/2012 de 20 de Junho, e demais legislação aplicável.
+    </div>
+
+    <div class="section-title">Das Disposições Finais</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 44ª.</span> O presente contrato constitui a manifestação integral da vontade das partes, revogando quaisquer acordos anteriores, verbais ou escritos, relativos ao mesmo objeto.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 45ª.</span> A invalidade ou inexequibilidade de qualquer cláusula deste contrato não afetará a validade das restantes disposições, que permanecerão em pleno vigor.
+    </div>
+
+    <div class="section-title">Da Assinatura, Autenticação e Vigência</div>
+    
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 46ª.</span> O Contrato é elaborado em duplicado, destinandose um exemplar a cada Parte.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 47ª.</span> As assinaturas serão reconhecidas presencialmente por Advogado, nos termos do art.º 38.º EOA.
+    </div>
+    <div class="clause">
+        <span class="clause-title">CLÁUSULA 48º.</span> O Contrato entra em vigor na Data de Início e mantémse válido até cumprimento integral das obrigações.
+    </div>
+
+    <div class="signature-section">
+        <p><span class="highlight">Local:</span> {{signature_location}}</p>
+        <p><span class="highlight">Data:</span> {{contract_date}}</p>
+        
+        <br><br>
+        
+        <p><span class="highlight">VENDEDOR(A):</span> <span class="signature-line"></span></p>
+        <p><span class="highlight">COMPRADOR(A):</span> <span class="signature-line"></span></p>
+    </div>
+
+    <div class="authorization-section">
+        <div class="section-title">Autorização de Débito Direto</div>
+        
+        <p>Ao subscrever esta autorização, está a autorizar a PINKLEGION – UNIPESSOAL, LDA, NIF: 518899586 a enviar instruções ao seu Banco para debitar a sua conta.</p>
+        
+        <div class="creditor-debtor">
+            <div class="creditor">
+                <p><span class="highlight">Credor:</span></p>
+                <ul>
+                    <li>Nome: PINKLEGION – UNIPESSOAL, LDA</li>
+                    <li>NIF: 518899586</li>
+                    <li>Endereço: Rua do Bacelo, nº 266, Código Postal nº 4475 325, Milheirós, Maia</li>
+                    <li>País: Portugal</li>
+                    <li>Banco: Caixa Geral de Depósitos</li>
+                    <li>IBAN: PT50 0035 0196 00031190330 59</li>
+                    <li>SWIFT: CGDIPTPL</li>
+                </ul>
+            </div>
+            
+            <div class="debtor">
+                <p><span class="highlight">Devedor:</span></p>
+                <ul>
+                    <li>Nome: {{full_name}}</li>
+                    <li>NIF: {{nif}}</li>
+                    <li>Endereço: {{address}}</li>
+                    <li>País: {{nationality}}</li>
+                    <li>Banco: {{bank_name}}</li>
+                    <li>IBAN: {{iban}}</li>
+                    <li>SWIFT: {{client_swift}}</li>
+                </ul>
+            </div>
+        </div>
+        
+        <p><span class="highlight">Método de pagamento:</span> {{payment_method}}</p>
+        <p><span class="highlight">Tipo de pagamento:</span> Pagamento recorrente</p>
+        <p><span class="highlight">Local de assinatura:</span> {{signature_location}}</p>
+        <p><span class="highlight">Data:</span> {{contract_date}}</p>
+        
+        <br><br>
+        
+        <p><span class="highlight">Assinatura:</span> <span class="signature-line"></span></p>
+    </div>
+</body>
+</html>

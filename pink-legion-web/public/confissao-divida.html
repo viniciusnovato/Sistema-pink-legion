@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Termo de Confissão de Dívida</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', serif;
+      font-size: 12px;
+      line-height: 1.4;
+      margin: 20px;
+      color: #000;
+    }
+    .header {
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 30px;
+      text-transform: uppercase;
+    }
+    .section-title {
+      font-weight: bold;
+      font-size: 14px;
+      margin: 20px 0 10px 0;
+      text-transform: uppercase;
+    }
+    .clause {
+      margin: 15px 0;
+      text-align: justify;
+    }
+    .clause-title {
+      font-weight: bold;
+      display: inline;
+    }
+    .highlight { font-weight: bold; }
+    .parties { margin: 20px 0; }
+    .signature-section {
+      margin-top: 40px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .signature-line {
+      border-bottom: 1px solid #000;
+      width: 300px;
+      margin: 20px 0;
+      display: inline-block;
+    }
+    @media print {
+      body { margin: 15px; }
+      .section-title { margin: 12px 0 6px 0; }
+      .clause { margin: 10px 0; }
+      .signature-section { page-break-before: avoid; page-break-after: avoid; }
+    }
+    ul { margin: 10px 0; padding-left: 20px; }
+    li { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    Confissão de Dívida, Reconhecimento de Obrigação e Título Executivo Europeu
+  </div>
+
+  <div class="section-title">Das Partes</div>
+  <div class="parties">
+    <p>
+      <span class="highlight">CREDOR(A):</span>
+      PINKLEGION – UNIPESSOAL, LDA, pessoa coletiva, inscrita com o NIPC nº 518899586,
+      com sede à Rua do Bacelo, nº 266, Código Postal nº 4475 325, Milheirós, Maia – Portugal,
+      através de seu representante legal com os poderes para o acto, doravante denominado Credor(a).
+    </p>
+    <p>
+      <span class="highlight">DEVEDOR(A):</span>
+      {{debtor_full_name}}, {{debtor_nif}}, residente em {{debtor_address}}, {{debtor_nationality}},
+      doravante denominado Devedor(a).
+    </p>
+  </div>
+
+  <div class="section-title">Objeto – Origem da Dívida</div>
+  <div class="clause">
+    <span class="clause-title">Cláusula 1ª.</span>
+    O(A) DEVEDOR(A) adquiriu ao(à) CREDOR(A) um veículo automotor, qualificado no
+    Contrato de Compra e Venda com Reserva de Propriedade nº <span class="highlight">{{ccv_number}}</span>,
+    devidamente assinado e anexado a este.
+  </div>
+
+  <div class="section-title">Da Confissão Expressa da Dívida</div>
+  <div class="clause">
+    <span class="clause-title">Cláusula 2ª.</span>
+    Em resultado da aquisição prevista na Cláusula 1ª, o(a) DEVEDOR(A) reconhece ter contraído perante
+    o(à) CREDOR(A) uma obrigação no montante total de
+    <span class="highlight">€ {{total_amount}} ({{total_amount_text}})</span>, certa, líquida e exigível,
+    relativo ao preço da viatura e despesas associadas.
+  </div>
+  <div class="clause">
+    <span class="highlight">§ Único.</span>
+    Nos termos do Art. 394º, nº 2, do Código Civil Português, o(a) DEVEDOR(A) confessa e reconhece integralmente
+    a dívida prevista nesta Cláusula, renunciando a qualquer alegação de compensação, condição ou dedução que possa afetá-la.
+  </div>
+
+  <div class="section-title">Do Título Executivo</div>
+  <div class="clause">
+    <span class="clause-title">Cláusula 3ª.</span>
+    A presente confissão configura e constitui <span class="highlight">TÍTULO EXECUTIVO EXTRAJUDICIAL</span>,
+    para os efeitos do Art. 703º, nº 1, alínea b), do Código de Processo Civil, permitindo ao(à) CREDOR(A)
+    instaurar diretamente o processo executivo em caso de incumprimento.
+  </div>
+  <div class="clause">
+    <span class="highlight">§ Único.</span>
+    Para os efeitos do Regulamento (CE) nº 805/2004 – Título Executivo Europeu (TEE) – as partes reconhecem
+    que o presente documento contém uma obrigação não impugnada. O Devedor declara que:
+    <ul>
+      <li>Foi informado do direito de se opor à dívida e de instaurar o processo declarativo, mas opta por não o fazer;</li>
+      <li>Concorda que o presente termo possa ser certificado com TEE, permitindo a execução direta em qualquer Estado-Membro
+          da União Europeia sem necessidade de exequatur.</li>
+    </ul>
+  </div>
+
+  <div class="section-title">Do Plano de Pagamento</div>
+  <div class="clause">
+    <span class="clause-title">Cláusula 4ª.</span>
+    As partes acordam que a dívida será liquidada da seguinte forma:
+    <ul>
+      <li>01 (uma) entrada de <span class="highlight">€ {{down_payment}} ({{down_payment_text}})</span>; e</li>
+      <li>O restante, em <span class="highlight">{{installments}}</span> parcelas mensais e sucessivas,
+          com vencimento da primeira previsto para <span class="highlight">{{first_due_date}}</span>.</li>
+    </ul>
+  </div>
+  <div class="clause">
+    <span class="highlight">§1º.</span>
+    Os pagamentos serão realizados mediante <span class="highlight">{{payment_method}}</span>, para o IBAN do(da) CREDOR(A), qual seja:
+    <span class="highlight">PT50 0035 0196 00031190330 59</span>.
+  </div>
+  <div class="clause">
+    <span class="highlight">§2º.</span>
+    O(À) CREDOR(A) poderá aderir a plataformas de pagamentos através de débitos diretos dos respetivos valores e datas pactuados,
+    cabendo ao(à) DEVEDOR(A) informar os dados bancários, atempadamente.
+  </div>
+  <div class="clause">
+    <span class="highlight">§3º.</span>
+    O(A) DEVEDOR(A) poderá antecipar, parcial ou totalmente, qualquer prestação, sem penalidade, devendo informar o(à) CREDOR(A)
+    com antecedência mínima de 3 (três) dias.
+  </div>
+
+  <div class="section-title">Do Incumprimento</div>
+  <div class="clause">
+    <span class="clause-title">Cláusula 5ª.</span>
+    O pagamento realizado intempestivamente implica:
+    <ul>
+      <li>Vencimento antecipado de todas as quantias remanescentes;</li>
+      <li>Aplicação de juros moratórios à taxa legal civil (Portaria nº 291/2003), acrescida de 7 p.p. nos termos do DL 62/2013; e</li>
+      <li>Obrigação do(a) DEVEDOR(A) de suportar todas as despesas e custas inerentes à cobrança, judiciais, extrajudiciais e honorários de advogado.</li>
+    </ul>
+  </div>
+
+  <div class="signature-section">
+    <p><span class="highlight">Local:</span> {{signature_location}}</p>
+    <p><span class="highlight">Data:</span> {{contract_date}}</p>
+
+    <br/><br/>
+
+    <p><span class="highlight">CREDOR(A):</span> <span class="signature-line"></span></p>
+    <p><span class="highlight">DEVEDOR(A):</span> <span class="signature-line"></span></p>
+  </div>
+</body>
+</html>

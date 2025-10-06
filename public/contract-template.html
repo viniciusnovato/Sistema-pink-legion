@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Contrato de Compra e Venda de Veículo</title>
+  <style>
+    body { font-family: 'Times New Roman', Times, serif; margin: 0; padding: 40px; }
+    .container { width: 800px; margin: auto; }
+    .header { text-align: center; margin-bottom: 20px; }
+    h1 { font-size: 24px; text-transform: uppercase; }
+    .section-title { font-weight: bold; margin-top: 20px; text-transform: uppercase; }
+    .section { margin-bottom: 16px; }
+    .label { font-weight: bold; }
+    .clause { margin-top: 12px; }
+    .footer { margin-top: 40px; }
+    .signature { margin-top: 40px; }
+    .row { margin: 4px 0; }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Template uses standard serif font; no external font needed -->
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Contrato de Compra e Venda de Veículo</h1>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Vendedor:</div>
+      <div class="row"><span class="label">PINK LEGION, LDA</span></div>
+      <div class="row">NIF: 123456789</div>
+      <div class="row">Morada: Rua da Empresa, 123, 1000-000 Lisboa</div>
+      <div class="row">IBAN: {{seller_iban}}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Comprador:</div>
+      <div class="row">Nome: {{full_name}}</div>
+      <div class="row">NIF: {{nif}}</div>
+      <div class="row">Documento de Identificação: {{nationality}}</div>
+      <div class="row">Morada: {{address}}</div>
+      <div class="row">Telefone: {{phone}}</div>
+      <div class="row">Email: {{email}}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Identificação do Veículo:</div>
+      <div class="row">Marca: {{brand}}</div>
+      <div class="row">Modelo: {{model}}</div>
+      <div class="row">Matrícula: {{license_plate}}</div>
+      <div class="row">Número de Chassi (VIN): {{vin}}</div>
+      <div class="row">Cilindrada: {{engine}}</div>
+      <div class="row">Cor: {{color}}</div>
+      <div class="row">Ano: {{year}}</div>
+      <div class="row">Quilometragem: {{mileage}}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Preço e Condições de Pagamento:</div>
+      <div class="row">Preço global: {{total_amount}} ({{total_amount_text}})</div>
+      <div class="row">Sinal: {{down_payment}} ({{down_payment_text}})</div>
+      <div class="row">Valor financiado: {{financed_amount}} ({{financed_amount_text}})</div>
+      <div class="row">Pagamento em {{installments}} prestações de {{installment_amount}} ({{installment_amount_text}})</div>
+      <div class="row">Data de entrega: {{first_payment_date}}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Garantia:</div>
+      <div class="row">O veículo é vendido no estado em que se encontra, com garantia legal de 6 meses.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Despesas:</div>
+      <div class="row">Despesas de registo e legalização são da responsabilidade do comprador, salvo acordo em contrário.</div>
+    </div>
+
+    <div class="section clause">
+      <div class="section-title">Cláusulas:</div>
+      <div class="row">1. O comprador declara ter examinado o veículo e aceita o seu estado atual.</div>
+      <div class="row">2. Em caso de incumprimento, o vendedor reserva-se o direito de resolver o contrato.</div>
+      <div class="row">3. Qualquer litígio será resolvido no foro da comarca de Lisboa.</div>
+    </div>
+
+    <div class="footer">
+      <div class="row">Lisboa, {{contract_date}}</div>
+    </div>
+
+    <div class="signature">
+      <div class="row">____________________________________</div>
+      <div class="row">Assinatura do Comprador</div>
+      <br/>
+      <div class="row">____________________________________</div>
+      <div class="row">Assinatura do Vendedor</div>
+    </div>
+  </div>
+</body>
+</html>
