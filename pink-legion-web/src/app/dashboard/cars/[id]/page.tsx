@@ -29,14 +29,15 @@ interface Car {
   brand: string
   model: string
   license_plate: string
+  vin?: string
   year: number
   mileage: number
   color: string
   engine: string
-  price: string
   purchase_price?: string
   sale_price?: string
   status: 'disponivel' | 'vendido' | 'reservado'
+  notes?: string
   created_at: string
   updated_at: string
 }
@@ -698,7 +699,7 @@ export default function CarDetailsPage() {
                     <div>
                       <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-1">Preço de Venda</p>
                       <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
-                        {parseFloat(car.sale_price || car.price).toLocaleString('pt-PT', {
+                        {parseFloat(car.sale_price || '0').toLocaleString('pt-PT', {
                           style: 'currency',
                           currency: 'EUR'
                         })}

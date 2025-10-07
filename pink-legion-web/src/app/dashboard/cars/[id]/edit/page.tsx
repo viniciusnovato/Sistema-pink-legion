@@ -25,7 +25,6 @@ interface Car {
   mileage: number
   color: string
   engine: string
-  price: string
   purchase_price?: string
   sale_price?: string
   status: 'disponivel' | 'vendido' | 'reservado'
@@ -51,7 +50,6 @@ export default function EditCarPage() {
     mileage: 0,
     color: '',
     engine: '',
-    price: '',
     purchase_price: '',
     sale_price: '',
     status: 'disponivel' as 'disponivel' | 'vendido' | 'reservado',
@@ -86,7 +84,6 @@ export default function EditCarPage() {
         mileage: data.mileage || 0,
         color: data.color || '',
         engine: data.engine || '',
-        price: data.price || '',
         purchase_price: data.purchase_price || '',
         sale_price: data.sale_price || '',
         status: data.status || 'disponivel',
@@ -122,7 +119,6 @@ export default function EditCarPage() {
           mileage: formData.mileage,
           color: formData.color,
           engine: formData.engine,
-          price: parseFloat(formData.price),
           purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
           sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
           status: formData.status,
