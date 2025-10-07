@@ -193,6 +193,7 @@ function applyPlaceholders(template: string, data: LibContractData, type: Contra
     financed_amount: formatCurrency(data.contract.financed_amount || 0),
     installments: String(data.contract.installments || 0),
     installment_amount: formatCurrency(data.contract.installment_amount || 0),
+    installment_amount_text: numberToWordsPt(Number(data.contract.installment_amount || 0)),
     delivery_date: new Date(data.contract.delivery_date).toLocaleDateString('pt-PT'),
     contract_date: contractDate.toLocaleDateString('pt-PT'),
     first_payment_date: firstPaymentDate.toLocaleDateString('pt-PT'),
