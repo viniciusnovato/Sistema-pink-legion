@@ -536,13 +536,9 @@ export default function EditClientPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Rua e Número"
-                value={`${client.address?.street || ''} ${client.address?.number || ''}`.trim()}
+                value={client.address?.street || ''}
                 onChange={(e) => {
-                  const parts = e.target.value.split(' ')
-                  const number = parts[parts.length - 1]
-                  const street = parts.slice(0, -1).join(' ')
-                  handleInputChange('address.street', street)
-                  handleInputChange('address.number', number)
+                  handleInputChange('address.street', e.target.value)
                 }}
                 placeholder="Rua das Flores, 123"
               />
@@ -552,6 +548,9 @@ export default function EditClientPage() {
                 onChange={(e) => handleInputChange('address.city', e.target.value)}
                 placeholder="Lisboa"
               />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Código Postal"
                 value={client.address?.postal_code || ''}
