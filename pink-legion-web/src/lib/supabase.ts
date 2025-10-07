@@ -95,7 +95,8 @@ export type Database = {
           mileage: number
           color: string
           engine: string
-          price: number
+          purchase_price: number
+          sale_price: number
           status: 'disponivel' | 'vendido' | 'reservado'
           sold_to: string | null
           sold_at: string | null
@@ -112,7 +113,8 @@ export type Database = {
           mileage: number
           color: string
           engine: string
-          price: number
+          purchase_price: number
+          sale_price: number
           status?: 'disponivel' | 'vendido' | 'reservado'
           sold_to?: string | null
           sold_at?: string | null
@@ -129,7 +131,8 @@ export type Database = {
           mileage?: number
           color?: string
           engine?: string
-          price?: number
+          purchase_price?: number
+          sale_price?: number
           status?: 'disponivel' | 'vendido' | 'reservado'
           sold_to?: string | null
           sold_at?: string | null
