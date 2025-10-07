@@ -77,7 +77,20 @@ export default function EditClientPage() {
       if (error) throw error
       
       // Set client data and IBAN input
-      setClient(data)
+      // Ensure address object exists
+      const clientData = {
+        ...data,
+        address: data.address || {
+          street: '',
+          number: '',
+          complement: '',
+          parish: '',
+          city: '',
+          district: '',
+          postal_code: ''
+        }
+      }
+      setClient(clientData)
       if (data.iban) {
         setIbanInput(data.iban)
         handleIbanChange(data.iban)
@@ -98,7 +111,7 @@ export default function EditClientPage() {
       setClient(prev => prev ? {
         ...prev,
         address: {
-          ...prev.address,
+          ...(prev.address || {}),
           [addressField]: value
         }
       } : null)
@@ -523,7 +536,7 @@ export default function EditClientPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Rua e Número"
-                value={`${client.address.street || ''} ${client.address.number || ''}`.trim()}
+                value={`${client.address?.street || ''} ${client.address?.number || ''}`.trim()}
                 onChange={(e) => {
                   const parts = e.target.value.split(' ')
                   const number = parts[parts.length - 1]
@@ -535,13 +548,13 @@ export default function EditClientPage() {
               />
               <Input
                 label="Cidade"
-                value={client.address.city || ''}
+                value={client.address?.city || ''}
                 onChange={(e) => handleInputChange('address.city', e.target.value)}
                 placeholder="Lisboa"
               />
               <Input
                 label="Código Postal"
-                value={client.address.postal_code || ''}
+                value={client.address?.postal_code || ''}
                 onChange={(e) => handleInputChange('address.postal_code', e.target.value)}
                 placeholder="1000-000"
               />
