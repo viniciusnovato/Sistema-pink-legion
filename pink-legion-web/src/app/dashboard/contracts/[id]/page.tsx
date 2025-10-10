@@ -237,8 +237,9 @@ export default function ContractViewPage() {
 
       if (filePath) {
         // Usar file_path se disponível (nova estrutura)
-        pathToFile = filePath
-        console.log('[downloadDocument] Nova estrutura detectada. file_path:', pathToFile)
+        // Remover prefixo 'documents/' se presente para evitar duplicação
+        pathToFile = filePath.startsWith('documents/') ? filePath.substring('documents/'.length) : filePath
+        console.log('[downloadDocument] Nova estrutura detectada. file_path original:', filePath, 'path corrigido:', pathToFile)
       } else if (documentUrl) {
         // Fallback para URL antiga
         if (documentUrl.includes('car-documents')) {
@@ -279,35 +280,58 @@ export default function ContractViewPage() {
         console.log('Usando URL, pathToFile:', pathToFile) // Debug log
       }
 
-      console.log('Bucket:', bucketName, 'Path:', pathToFile) // Debug log
+      console.log('[downloadDocument] Tentando download:', { 
+        documentId: document.id,
+        bucketName, 
+        pathToFile, 
+        documentUrl, 
+        filePath,
+        documentName: document.document_name || document.file_name,
+        category: document.category
+      })
 
-      const { data, error } = await supabase.storage
-        .from(bucketName)
-        .createSignedUrl(pathToFile, 3600) // 1 hora de validade
+      // Usar a nova API de download com service_role
+      const response = await fetch('/api/download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bucketName,
+          filePath: pathToFile
+        })
+      })
 
-      if (error) {
-        console.error('[downloadDocument] Erro ao gerar URL de download:', error, { bucketName, pathToFile, documentUrl, filePath })
-        const isNotFound = (error.message || '').toLowerCase().includes('object not found')
+      const result = await response.json()
+
+      if (!response.ok) {
+        console.error('[downloadDocument] Erro na API:', result)
+        
+        const isNotFound = (result.details || '').toLowerCase().includes('object not found')
+        const isUnauthorized = (result.details || '').toLowerCase().includes('unauthorized')
+        
         if (isNotFound) {
           const msgBase = 'Arquivo não encontrado no servidor.'
-          const hint = bucketName === 'client-files'
-            ? 'Documento legado de cliente: verifique se não foi movido ou renomeado.'
-            : 'O documento pode ter sido movido ou deletado.'
-          alert(`${msgBase} ${hint}`)
+          let hint = 'O documento pode ter sido movido ou deletado.'
+          
+          if (bucketName === 'client-files') {
+            hint = 'Documento legado de cliente: verifique se não foi movido ou renomeado.'
+          } else if (document.category === 'contract_signed') {
+            hint = 'Contrato assinado não encontrado. Verifique se o arquivo foi carregado corretamente.'
+          }
+          
+          alert(`${msgBase} ${hint}\n\nDetalhes técnicos:\nBucket: ${bucketName}\nCaminho: ${pathToFile}`)
+        } else if (isUnauthorized) {
+          alert('Erro de permissão ao acessar o arquivo. Verifique suas credenciais.')
         } else {
-          alert('Erro ao gerar link de download. Tente novamente mais tarde.')
+          alert(`Erro ao gerar link de download: ${result.error}\n\nTente novamente mais tarde.`)
         }
         return
       }
 
-      if (data?.signedUrl) {
-        // Criar um elemento <a> temporário para forçar o download
-        const link = window.document.createElement('a')
-        link.href = data.signedUrl
-        link.download = document.document_name || document.file_name || 'documento.pdf'
-        window.document.body.appendChild(link)
-        link.click()
-        window.document.body.removeChild(link)
+      if (result.signedUrl) {
+        // Abrir URL assinada em nova aba
+        window.open(result.signedUrl, '_blank')
       }
     } catch (error) {
       console.error('Erro ao fazer download:', error)
@@ -349,12 +373,8 @@ export default function ContractViewPage() {
       }
 
       if (data?.signedUrl) {
-        const link = window.document.createElement('a')
-        link.href = data.signedUrl
-        link.download = photo.file_name || 'foto-carro.jpg'
-        window.document.body.appendChild(link)
-        link.click()
-        window.document.body.removeChild(link)
+        // Abrir foto em nova aba
+        window.open(data.signedUrl, '_blank')
       }
     } catch (error) {
       console.error('Erro ao baixar foto:', error)
@@ -418,7 +438,7 @@ export default function ContractViewPage() {
           contract_id: contractId,
           document_type: 'contrato',
           file_name: fileName,
-          file_path: `documents/${filePath}`,
+          file_path: filePath, // Just the path within the bucket: contractId/filename
           file_size: file.size,
           mime_type: file.type,
           category: 'contract_signed'
