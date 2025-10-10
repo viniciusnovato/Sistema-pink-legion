@@ -76,25 +76,80 @@ export default function EditClientPage() {
 
       if (error) throw error
       
-      // Set client data and IBAN input
-      // Ensure address object exists
-      const clientData = {
-        ...data,
-        address: data.address || {
-          street: '',
-          number: '',
-          complement: '',
-          parish: '',
-          city: '',
-          district: '',
-          postal_code: ''
+      // Process address field - it might be a JSON string or object
+      let processedAddress = {
+        street: '',
+        number: '',
+        complement: '',
+        parish: '',
+        city: '',
+        district: '',
+        postal_code: ''
+      }
+
+      if (data.address) {
+        if (typeof data.address === 'string') {
+          try {
+            // Try to parse as JSON string
+            const parsedAddress = JSON.parse(data.address)
+            processedAddress = {
+              street: parsedAddress.street || '',
+              number: parsedAddress.number || '',
+              complement: parsedAddress.complement || '',
+              parish: parsedAddress.parish || '',
+              city: parsedAddress.city || '',
+              district: parsedAddress.district || '',
+              postal_code: parsedAddress.postal_code || ''
+            }
+          } catch (e) {
+            // If parsing fails, treat as plain string for street
+            processedAddress.street = data.address
+          }
+        } else if (typeof data.address === 'object') {
+          // Already an object
+          processedAddress = {
+            street: data.address.street || '',
+            number: data.address.number || '',
+            complement: data.address.complement || '',
+            parish: data.address.parish || '',
+            city: data.address.city || '',
+            district: data.address.district || '',
+            postal_code: data.address.postal_code || ''
+          }
         }
       }
+
+      // Set client data with processed address
+      const clientData = {
+        ...data,
+        // Ensure all fields have default values to prevent undefined
+        phone: data.phone || '',
+        birth_date: data.birth_date || '',
+        gender: data.gender || '',
+        nationality: data.nationality || '',
+        profession: data.profession || '',
+        monthly_income: data.monthly_income || 0,
+        marital_status: data.marital_status || 'single',
+        iban: data.iban || '',
+        bank_name: data.bank_name || '',
+        account_holder: data.account_holder || '',
+        card_number: data.card_number || '',
+        card_holder_name: data.card_holder_name || '',
+        card_expiry: data.card_expiry || '',
+        card_cvv: data.card_cvv || '',
+        notes: data.notes || '',
+        address: processedAddress
+      }
+      
       setClient(clientData)
+      
+      // Set IBAN input if exists
       if (data.iban) {
         setIbanInput(data.iban)
         handleIbanChange(data.iban)
       }
+      
+      console.log('Cliente carregado:', clientData)
     } catch (error) {
       logger.error('Erro ao carregar cliente', error as Error, 'CLIENT_FETCH')
       router.push('/clients')
@@ -187,6 +242,7 @@ export default function EditClientPage() {
       const clientData = {
         ...client,
         monthly_income: typeof client.monthly_income === 'string' ? parseFloat(client.monthly_income) || 0 : client.monthly_income,
+        birth_date: client.birth_date || null, // Convert empty string to null for date fields
         iban: ibanInput || null,
         bank_name: detectedBank || null,
         account_holder: client.full_name,
@@ -535,17 +591,47 @@ export default function EditClientPage() {
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
-                label="Rua e Número"
+                label="Rua"
                 value={client.address?.street || ''}
                 onChange={(e) => {
                   handleInputChange('address.street', e.target.value)
                 }}
-                placeholder="Rua das Flores, 123"
+                placeholder="Rua das Flores"
               />
+              <Input
+                label="Número"
+                value={client.address?.number || ''}
+                onChange={(e) => handleInputChange('address.number', e.target.value)}
+                placeholder="123"
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Input
+                label="Complemento"
+                value={client.address?.complement || ''}
+                onChange={(e) => handleInputChange('address.complement', e.target.value)}
+                placeholder="3º Dto, Apartamento A"
+              />
+              <Input
+                label="Freguesia"
+                value={client.address?.parish || ''}
+                onChange={(e) => handleInputChange('address.parish', e.target.value)}
+                placeholder="Santa Maria Maior"
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Cidade"
                 value={client.address?.city || ''}
                 onChange={(e) => handleInputChange('address.city', e.target.value)}
+                placeholder="Lisboa"
+              />
+              <Input
+                label="Distrito"
+                value={client.address?.district || ''}
+                onChange={(e) => handleInputChange('address.district', e.target.value)}
                 placeholder="Lisboa"
               />
             </div>
