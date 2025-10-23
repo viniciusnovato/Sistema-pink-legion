@@ -1,0 +1,59 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# macOS
+.DS_Store
+*.pem
+
+# Node version manager
+node-v*/
+node*.tar.gz
+
+# Environment variables
+.env
+.env*.local
+.env.production
+.env.development
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.expo/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+expo-env.d.ts
+
+# Test coverage
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.log
+*.tmp
+*.temp
+
+# PDFs generated
+*.pdf
+!public/*.pdf
+
+# Vercel
+.vercel
+
+# Debug
+debug/
+test-*/
+
