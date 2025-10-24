@@ -374,6 +374,13 @@ export default function EditContractPage() {
   const generateContractPDFs = async () => {
     if (!contract) return
 
+    // 🔍 DEBUG - Log dos dados do contrato
+    console.log('🔍 DEBUG - Regeneração - Dados do Cliente:', {
+      id: contract.clients.id,
+      full_name: contract.clients.full_name,
+      address_raw: contract.clients.address
+    })
+
     const libContractData: LibContractData = {
       client: {
         id: contract.clients.id,
@@ -386,7 +393,12 @@ export default function EditContractPage() {
           if (typeof contract.clients.address === 'string') {
             try {
               const addr = JSON.parse(contract.clients.address)
-              return `${addr.street || ''} ${addr.number || ''}`.trim()
+              // Montar endereço completo com complemento
+              const parts = []
+              if (addr.street) parts.push(addr.street)
+              if (addr.number) parts.push(addr.number)
+              if (addr.complement) parts.push(addr.complement)
+              return parts.join(', ').trim()
             } catch {
               return contract.clients.address.trim()
             }
@@ -450,6 +462,9 @@ export default function EditContractPage() {
         notes: observations
       }
     }
+
+    // 🔍 DEBUG - Log do LibContractData montado
+    console.log('🔍 DEBUG - Regeneração - LibContractData montado:', libContractData.client)
 
     // Gerar PDF via endpoint server-side (Puppeteer)
     const saleResp = await fetch('/api/generate-contract', {
