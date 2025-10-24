@@ -69,6 +69,13 @@ interface Client {
   email: string
   phone?: string
   address?: string
+  street?: string
+  number?: string
+  city?: string
+  postal_code?: string
+  nationality?: string
+  bank_name?: string
+  iban?: string
   nif?: string
 }
 
