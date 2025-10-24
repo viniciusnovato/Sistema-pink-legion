@@ -180,6 +180,13 @@ export default function EditContractPage() {
             email,
             phone,
             address,
+            street,
+            number,
+            city,
+            postal_code,
+            nationality,
+            bank_name,
+            iban,
             nif
           )
         `)
