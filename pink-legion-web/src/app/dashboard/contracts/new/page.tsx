@@ -454,7 +454,12 @@ export default function NewContractPage() {
             if (typeof selectedClient.address === 'string') {
               try {
                 const addr = JSON.parse(selectedClient.address)
-                return `${addr.street || ''} ${addr.number || ''}`.trim()
+                // Montar endereço completo com todos os campos do JSON
+                const parts = []
+                if (addr.street) parts.push(addr.street)
+                if (addr.number) parts.push(addr.number)
+                if (addr.complement) parts.push(addr.complement)
+                return parts.join(', ').trim()
               } catch {
                 // If not JSON, return as is
                 return selectedClient.address.trim()
