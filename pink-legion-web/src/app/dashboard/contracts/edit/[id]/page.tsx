@@ -204,6 +204,17 @@ export default function EditContractPage() {
       
       setContract(contractData)
       
+      // 🔍 FETCH - LOG COMPLETO dos dados do cliente recebidos do banco
+      console.log('🔍 FETCH - Dados recebidos do banco:', {
+        'clients.id': contractData.clients.id,
+        'clients.full_name': contractData.clients.full_name,
+        'clients.address': contractData.clients.address,
+        'clients.street': contractData.clients.street,
+        'clients.number': contractData.clients.number,
+        'clients.city': contractData.clients.city,
+        'clients.postal_code': contractData.clients.postal_code,
+      })
+      
       // Populate form with existing data
       setSalePrice(contractData.total_amount?.toString() || '')
       setDownPayment(contractData.down_payment?.toString() || '')
@@ -392,7 +403,11 @@ export default function EditContractPage() {
     console.log('🔍 DEBUG - Regeneração - Dados do Cliente:', {
       id: contract.clients.id,
       full_name: contract.clients.full_name,
-      address_raw: contract.clients.address
+      address_raw: contract.clients.address,
+      street: contract.clients.street,
+      number: contract.clients.number,
+      city: contract.clients.city,
+      postal_code: contract.clients.postal_code,
     })
 
     const libContractData: LibContractData = {
@@ -496,6 +511,13 @@ export default function EditContractPage() {
         notes: observations
       }
     }
+
+    // 🔍 DEBUG - Log COMPLETO do address montado
+    console.log('🔍 DEBUG - Address construído:', {
+      'address': libContractData.client.address,
+      'city': libContractData.client.city,
+      'postal_code': libContractData.client.postal_code
+    })
 
     // 🔍 DEBUG - Log do LibContractData montado
     console.log('🔍 DEBUG - Regeneração - LibContractData montado:', libContractData.client)
