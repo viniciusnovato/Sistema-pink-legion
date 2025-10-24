@@ -395,12 +395,24 @@ export default function EditContractPage() {
         email: contract.clients.email.trim(),
         phone: contract.clients.phone?.trim() || '',
         address: (() => {
-          if (!contract.clients.address) return ''
+          // PRIMEIRO: Priorizar campos separados
+          if (contract.clients.street) {
+            const parts = [contract.clients.street]
+            if (contract.clients.number) parts.push(contract.clients.number)
+            // Tentar pegar complemento do JSON se existir
+            if (contract.clients.address && typeof contract.clients.address === 'string') {
+              try {
+                const addr = JSON.parse(contract.clients.address)
+                if (addr.complement) parts.push(addr.complement)
+              } catch {}
+            }
+            return parts.join(', ').trim()
+          }
           
-          if (typeof contract.clients.address === 'string') {
+          // SEGUNDO: Fallback para JSON completo
+          if (contract.clients.address && typeof contract.clients.address === 'string') {
             try {
               const addr = JSON.parse(contract.clients.address)
-              // Montar endereço completo com complemento
               const parts = []
               if (addr.street) parts.push(addr.street)
               if (addr.number) parts.push(addr.number)
@@ -413,9 +425,13 @@ export default function EditContractPage() {
           return ''
         })(),
         city: (() => {
-          if (!contract.clients.address) return ''
+          // Priorizar campo separado city
+          if (contract.clients.city) {
+            return contract.clients.city
+          }
           
-          if (typeof contract.clients.address === 'string') {
+          // Fallback: tentar ler do campo address JSON
+          if (contract.clients.address && typeof contract.clients.address === 'string') {
             try {
               const addr = JSON.parse(contract.clients.address)
               return addr.city || ''
@@ -426,9 +442,13 @@ export default function EditContractPage() {
           return ''
         })(),
         postal_code: (() => {
-          if (!contract.clients.address) return ''
+          // Priorizar campo separado postal_code
+          if (contract.clients.postal_code) {
+            return contract.clients.postal_code
+          }
           
-          if (typeof contract.clients.address === 'string') {
+          // Fallback: tentar ler do campo address JSON
+          if (contract.clients.address && typeof contract.clients.address === 'string') {
             try {
               const addr = JSON.parse(contract.clients.address)
               return addr.postal_code || ''
