@@ -191,6 +191,14 @@ function applyPlaceholders(template: string, data: LibContractData, type: Contra
     return parts.filter(Boolean).join(', ')
   })()
 
+  // 🔍 DEBUG - Log da montagem do endereço
+  console.log('🔍 API - Montagem do endereço:', {
+    'data.client.address': data.client.address,
+    'data.client.city': data.client.city,
+    'data.client.postal_code': data.client.postal_code,
+    'fullAddress final': fullAddress
+  })
+
   const placeholders: Record<string, string> = {
     full_name: data.client.full_name || '',
     nif: data.client.nif || '',

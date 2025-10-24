@@ -435,6 +435,17 @@ export default function NewContractPage() {
         throw new Error('Matrícula do veículo é obrigatória')
       }
 
+      // 🔍 DEBUG - Log dos dados do cliente selecionado
+      console.log('🔍 DEBUG - Dados do Cliente Selecionado:', {
+        id: selectedClient.id,
+        full_name: selectedClient.full_name,
+        street: selectedClient.street,
+        number: selectedClient.number,
+        city: selectedClient.city,
+        postal_code: selectedClient.postal_code,
+        address_raw: selectedClient.address
+      })
+
       const libContractData: LibContractData = {
         client: {
           id: selectedClient.id,
@@ -442,26 +453,30 @@ export default function NewContractPage() {
           email: selectedClient.email.trim(),
           phone: selectedClient.phone?.trim() || '',
           address: (() => {
-            // Priorizar campos separados (street, number)
+            // Priorizar campos separados
             if (selectedClient.street) {
-              return `${selectedClient.street}${selectedClient.number ? ', ' + selectedClient.number : ''}`.trim()
+              const parts = [selectedClient.street]
+              if (selectedClient.number) parts.push(selectedClient.number)
+              // Tentar pegar complemento do JSON se existir
+              if (selectedClient.address && typeof selectedClient.address === 'string') {
+                try {
+                  const addr = JSON.parse(selectedClient.address)
+                  if (addr.complement) parts.push(addr.complement)
+                } catch {}
+              }
+              return parts.join(', ').trim()
             }
             
-            // Fallback: tentar ler do campo address antigo
-            if (!selectedClient.address) return ''
-            
-            // Check if address is stored as JSON
-            if (typeof selectedClient.address === 'string') {
+            // Fallback: ler tudo do JSON
+            if (selectedClient.address && typeof selectedClient.address === 'string') {
               try {
                 const addr = JSON.parse(selectedClient.address)
-                // Montar endereço completo com todos os campos do JSON
                 const parts = []
                 if (addr.street) parts.push(addr.street)
                 if (addr.number) parts.push(addr.number)
                 if (addr.complement) parts.push(addr.complement)
                 return parts.join(', ').trim()
               } catch {
-                // If not JSON, return as is
                 return selectedClient.address.trim()
               }
             }
@@ -539,6 +554,9 @@ export default function NewContractPage() {
           notes: observations?.trim() || ''
         }
       }
+
+      // 🔍 DEBUG - Log do LibContractData montado
+      console.log('🔍 DEBUG - LibContractData montado:', libContractData.client)
 
       // Gerar PDF via endpoint server-side (Puppeteer)
       const saleResp = await fetch('/api/generate-contract', {
