@@ -67,6 +67,10 @@ interface Client {
   email: string
   phone?: string
   address?: string
+  street?: string
+  number?: string
+  city?: string
+  postal_code?: string
   nif?: string
 }
 
@@ -438,6 +442,12 @@ export default function NewContractPage() {
           email: selectedClient.email.trim(),
           phone: selectedClient.phone?.trim() || '',
           address: (() => {
+            // Priorizar campos separados (street, number)
+            if (selectedClient.street) {
+              return `${selectedClient.street}${selectedClient.number ? ', ' + selectedClient.number : ''}`.trim()
+            }
+            
+            // Fallback: tentar ler do campo address antigo
             if (!selectedClient.address) return ''
             
             // Check if address is stored as JSON
@@ -453,6 +463,12 @@ export default function NewContractPage() {
             return ''
           })(),
           city: (() => {
+            // Priorizar campo separado city
+            if (selectedClient.city) {
+              return selectedClient.city
+            }
+            
+            // Fallback: tentar ler do campo address antigo
             if (!selectedClient.address) return ''
             
             // Check if address is stored as JSON to extract city
@@ -467,6 +483,12 @@ export default function NewContractPage() {
             return ''
           })(),
           postal_code: (() => {
+            // Priorizar campo separado postal_code
+            if (selectedClient.postal_code) {
+              return selectedClient.postal_code
+            }
+            
+            // Fallback: tentar ler do campo address antigo
             if (!selectedClient.address) return ''
             
             // Check if address is stored as JSON to extract postal code
@@ -775,18 +797,20 @@ export default function NewContractPage() {
                     <p><strong>Nome:</strong> {selectedClient.full_name}</p>
                     <p><strong>Email:</strong> {selectedClient.email}</p>
                     {selectedClient.phone && <p><strong>Telefone:</strong> {selectedClient.phone}</p>}
-                    {selectedClient.address && (
+                    {(selectedClient.street || selectedClient.address) && (
                       <p><strong>Morada:</strong> {
-                        typeof selectedClient.address === 'string' 
-                          ? (() => {
-                              try {
-                                const addr = JSON.parse(selectedClient.address)
-                                return `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`
-                              } catch {
-                                return selectedClient.address
-                              }
-                            })()
-                          : selectedClient.address
+                        selectedClient.street 
+                          ? `${selectedClient.street}${selectedClient.number ? ', ' + selectedClient.number : ''}, ${selectedClient.city || ''} ${selectedClient.postal_code || ''}`.trim()
+                          : (typeof selectedClient.address === 'string' 
+                              ? (() => {
+                                  try {
+                                    const addr = JSON.parse(selectedClient.address)
+                                    return `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`
+                                  } catch {
+                                    return selectedClient.address
+                                  }
+                                })()
+                              : selectedClient.address)
                       }</p>
                     )}
                     {selectedClient.nif && <p><strong>NIF:</strong> {selectedClient.nif}</p>}
