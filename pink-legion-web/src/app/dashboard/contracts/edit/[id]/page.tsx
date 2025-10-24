@@ -331,6 +331,8 @@ export default function EditContractPage() {
   const handleRegenerateContract = async () => {
     if (!contract) return
 
+    console.log('🔍 INÍCIO - handleRegenerateContract chamado')
+
     try {
       setRegenerating(true)
 
@@ -382,22 +384,32 @@ export default function EditContractPage() {
         console.error('Error deleting old documents:', deleteError)
       }
 
+      console.log('🔍 ANTES - Vai chamar generateContractPDFs()')
+
       // Generate new PDFs
       await generateContractPDFs()
+
+      console.log('🔍 DEPOIS - generateContractPDFs() completado')
 
       alert('Contrato regenerado com sucesso!')
       router.push(`/dashboard/contracts/${contractId}`)
 
     } catch (error) {
-      console.error('Error regenerating contract:', error)
+      console.error('🔴 ERRO - Error regenerating contract:', error)
       alert('Erro ao regenerar contrato')
     } finally {
+      console.log('🔍 FINALLY - Finalizando regeneração')
       setRegenerating(false)
     }
   }
 
   const generateContractPDFs = async () => {
-    if (!contract) return
+    console.log('🔍🔍🔍 ENTROU em generateContractPDFs()')
+    
+    if (!contract) {
+      console.log('🔴 ERRO - contract é null, saindo...')
+      return
+    }
 
     // 🔍 DEBUG - Log dos dados do contrato
     console.log('🔍 DEBUG - Regeneração - Dados do Cliente:', {
