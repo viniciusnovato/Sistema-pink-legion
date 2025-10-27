@@ -929,11 +929,11 @@ export default function ClientPage() {
                 
                 {/* Morada pré-preenchida do cliente */}
                 {client && client.address && (
-                  <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-                    <p className="text-sm text-blue-700 dark:text-blue-300 font-medium mb-1">
+                  <div className="mb-4 p-3 bg-background-light dark:bg-background-dark rounded-lg border">
+                    <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-1">
                       Morada registada:
                     </p>
-                    <p className="text-sm text-blue-600 dark:text-blue-400">
+                    <p className="font-medium text-text-primary-light dark:text-text-primary-dark">
                       {(() => {
                         try {
                           const addressData = typeof client.address === 'string' 
