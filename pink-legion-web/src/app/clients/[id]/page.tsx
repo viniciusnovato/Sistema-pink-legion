@@ -928,13 +928,28 @@ export default function ClientPage() {
                 </p>
                 
                 {/* Morada pré-preenchida do cliente */}
-                {client && (client.street || client.city || client.postal_code) && (
+                {client && client.address && (
                   <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
                     <p className="text-sm text-blue-700 dark:text-blue-300 font-medium mb-1">
                       Morada registada:
                     </p>
                     <p className="text-sm text-blue-600 dark:text-blue-400">
-                      {[client.street, client.number, client.city, client.postal_code].filter(Boolean).join(', ')}
+                      {(() => {
+                        try {
+                          const addressData = typeof client.address === 'string' 
+                            ? JSON.parse(client.address) 
+                            : client.address;
+                          return [
+                            addressData.street,
+                            addressData.number,
+                            addressData.city,
+                            addressData.postal_code
+                          ].filter(Boolean).join(', ');
+                        } catch (e) {
+                          // Fallback para campos individuais se o JSON estiver corrompido
+                          return [client.street, client.number, client.city, client.postal_code].filter(Boolean).join(', ');
+                        }
+                      })()}
                     </p>
                   </div>
                 )}
