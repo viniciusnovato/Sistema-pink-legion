@@ -3,11 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { getCurrentUserProfile, UserProfile } from '@/lib/rbac'
+import { logger } from '@/lib/logger'
+import type { User } from '@supabase/supabase-js'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import { FileText, Plus, Search, Eye, Download, Calendar, User, Car } from 'lucide-react'
+import { FileText, Plus, Search, Eye, Download, Calendar, User as UserIcon, Car } from 'lucide-react'
 
 interface Contract {
   id: string
@@ -34,10 +37,60 @@ export default function ContractsPage() {
   const [contracts, setContracts] = useState<Contract[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
 
   useEffect(() => {
-    fetchContracts()
-  }, [])
+    const initializePage = async () => {
+      try {
+        logger.info('Contracts page loaded', 'UI');
+        
+        // Verificar autenticação
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          logger.auth('No user found, redirecting to login');
+          router.push('/login');
+          return;
+        }
+
+        logger.auth('User authenticated in contracts page', { userId: user.id, email: user.email });
+        setUser(user);
+
+        // Buscar perfil do usuário
+        const userProfile = await getCurrentUserProfile();
+        if (!userProfile) {
+          logger.error('Error fetching user profile or user has no profile', undefined, 'RBAC');
+        } else {
+          logger.supabase('User profile fetched successfully', { profileId: userProfile.id, role: userProfile.role });
+        }
+        setProfile(userProfile);
+        
+        // Carregar contratos
+        await fetchContracts();
+        
+        setLoading(false);
+      } catch (error) {
+        logger.error('Unexpected error in contracts page initialization', error as Error, 'CONTRACTS');
+        setLoading(false);
+      }
+    };
+
+    initializePage();
+
+    // Escutar mudanças na autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        logger.auth(`Auth state change in contracts: ${event}`, { hasSession: !!session });
+        if (event === 'SIGNED_OUT' || !session) {
+          logger.auth('User signed out, redirecting to login');
+          router.push('/login');
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [router])
 
   const fetchContracts = async () => {
     try {
@@ -90,9 +143,24 @@ export default function ContractsPage() {
     return type === 'sale' ? 'Compra e Venda' : 'Confissão de Dívida'
   }
 
+  const handleLogout = async () => {
+    try {
+      logger.auth('User logging out from contracts page');
+      await supabase.auth.signOut();
+      router.push('/login');
+    } catch (error) {
+      logger.error('Error during logout', error as Error, 'AUTH');
+    }
+  }
+
   if (loading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
@@ -101,7 +169,12 @@ export default function ContractsPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      onLogout={handleLogout}
+      userRole={profile?.role}
+      userName={profile?.full_name || user?.email || ''}
+      userEmail={user?.email || ''}
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -192,7 +265,7 @@ export default function ContractsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center gap-2 text-text-secondary-light dark:text-text-secondary-dark">
-                    <User className="h-4 w-4" />
+                    <UserIcon className="h-4 w-4" />
                     <span className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">{contract.clients?.full_name || contract.client_name || 'Cliente não identificado'}</span>
                   </div>
                   <div className="flex items-center gap-2 text-text-secondary-light dark:text-text-secondary-dark">
