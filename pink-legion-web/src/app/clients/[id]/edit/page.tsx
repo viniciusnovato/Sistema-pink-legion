@@ -380,7 +380,7 @@ export default function EditClientPage() {
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-primary-800 hover:bg-primary-900 text-white"
+            className="bg-gray-700 hover:bg-gray-800 text-white"
           >
             <Save className="h-4 w-4 mr-2" />
             {saving ? 'Guardando...' : 'Guardar Alterações'}
@@ -747,7 +747,7 @@ export default function EditClientPage() {
           <Button
             onClick={handleSave}
             disabled={loading}
-            className="flex-1"
+            className="flex-1 bg-gray-700 hover:bg-gray-800 text-white"
           >
             <Save className="h-4 w-4 mr-2" />
             {loading ? 'Guardando...' : 'Guardar Alterações'}
