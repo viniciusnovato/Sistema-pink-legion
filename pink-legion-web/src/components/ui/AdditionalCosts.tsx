@@ -17,6 +17,15 @@ interface AdditionalCostsProps {
 }
 
 export function AdditionalCosts({ costs, onChange }: AdditionalCostsProps) {
+  // Função para normalizar valores numéricos
+  const normalizeValue = (value: any): number => {
+    if (value === null || value === undefined || value === '') return 0
+    const num = Number(value)
+    if (isNaN(num)) return 0
+    // Garantir que apenas valores positivos sejam aceitos
+    return Math.max(0, num)
+  }
+
   const addCost = () => {
     const newCost: AdditionalCost = {
       id: Date.now().toString(),
@@ -39,7 +48,7 @@ export function AdditionalCosts({ costs, onChange }: AdditionalCostsProps) {
   }
 
   const getTotalCosts = () => {
-    return costs.reduce((sum, cost) => sum + (Number(cost.value) || 0), 0)
+    return costs.reduce((sum, cost) => sum + normalizeValue(cost.value), 0)
   }
 
   return (
@@ -86,9 +95,22 @@ export function AdditionalCosts({ costs, onChange }: AdditionalCostsProps) {
                   <Input
                     type="number"
                     step="0.01"
+                    min="0"
                     placeholder="0.00"
                     value={cost.value || ''}
-                    onChange={(e) => updateCost(cost.id, 'value', parseFloat(e.target.value) || 0)}
+                    onChange={(e) => {
+                      const inputValue = e.target.value
+                      const numValue = Number(inputValue)
+                      
+                      // Se o usuário tentar inserir um valor negativo, mostrar feedback
+                      if (!isNaN(numValue) && numValue < 0) {
+                        // Opcional: mostrar um alerta ou toast
+                        console.warn('Valores negativos não são permitidos para custos adicionais')
+                      }
+                      
+                      const normalizedValue = normalizeValue(inputValue)
+                      updateCost(cost.id, 'value', normalizedValue)
+                    }}
                     className="pl-8"
                   />
                 </div>

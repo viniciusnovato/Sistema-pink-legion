@@ -127,7 +127,10 @@ export default function EditCarPage() {
         status: data.status || 'disponivel',
         notes: data.notes || '',
         photo_url: data.photo_url || null,
-        additional_costs: (data.additional_costs as AdditionalCost[]) || []
+        additional_costs: (data.additional_costs as AdditionalCost[])?.map(cost => ({
+          ...cost,
+          value: Number(cost.value) || 0
+        })) || []
       })
     } catch (error) {
       console.error('Erro ao buscar carro:', error)
@@ -152,7 +155,7 @@ export default function EditCarPage() {
     }
   }
 
-  const handleInputChange = (field: string, value: string | number) => {
+  const handleInputChange = (field: string, value: string | number | AdditionalCost[] | null) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -178,6 +181,9 @@ export default function EditCarPage() {
           purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
           sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
           status: formData.status,
+          notes: formData.notes,
+          photo_url: formData.photo_url,
+          additional_costs: formData.additional_costs,
           updated_at: new Date().toISOString()
         })
         .eq('id', carId)
