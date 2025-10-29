@@ -579,7 +579,7 @@ export default function EditCarPage() {
                   <div className="space-y-4">
                     <Button
                       type="submit"
-                      className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+                      className="w-full bg-primary-800 hover:bg-primary-900 text-white"
                       disabled={saving}
                     >
                       <Save className="h-4 w-4 mr-2" />

@@ -746,7 +746,7 @@ export default function EditContractPage() {
             <Button
               onClick={handleSaveChanges}
               disabled={saving}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+              className="flex items-center gap-2 bg-gray-700 hover:bg-gray-800 text-white"
             >
               <Save className="h-4 w-4" />
               {saving ? 'Salvando...' : 'Salvar Alterações'}
@@ -754,7 +754,7 @@ export default function EditContractPage() {
             <Button
               onClick={handleRegenerateContract}
               disabled={regenerating}
-              className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
             >
               <Download className="h-4 w-4" />
               {regenerating ? 'Regenerando...' : 'Regenerar Contrato'}
