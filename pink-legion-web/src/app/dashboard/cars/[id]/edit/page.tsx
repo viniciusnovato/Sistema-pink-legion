@@ -14,6 +14,8 @@ import {
   Save,
   Euro
 } from 'lucide-react'
+import { AdditionalCosts, type AdditionalCost } from '@/components/ui/AdditionalCosts'
+import { CarPhotosManager } from '@/components/ui/CarPhotosManager'
 
 interface Car {
   id: string
@@ -29,6 +31,8 @@ interface Car {
   sale_price?: string
   status: 'disponivel' | 'vendido' | 'reservado'
   notes?: string
+  photo_url?: string | null
+  additional_costs?: AdditionalCost[] | null
   created_at: string
   updated_at: string
 }
@@ -41,6 +45,9 @@ export default function EditCarPage() {
   const [car, setCar] = useState<Car | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
+  const [galleryPhotos, setGalleryPhotos] = useState<any[]>([])
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
@@ -53,12 +60,43 @@ export default function EditCarPage() {
     purchase_price: '',
     sale_price: '',
     status: 'disponivel' as 'disponivel' | 'vendido' | 'reservado',
-    notes: ''
+    notes: '',
+    photo_url: null as string | null,
+    additional_costs: [] as AdditionalCost[]
   })
 
   useEffect(() => {
+    checkUser()
     fetchCar()
+    fetchGalleryPhotos()
   }, [carId])
+
+  const checkUser = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
+      setUser(user)
+      
+      // Fetch user profile
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (profileData) {
+        setProfile(profileData)
+      }
+    } catch (error) {
+      console.error('Erro ao verificar usuário:', error)
+      router.push('/login')
+    }
+  }
 
   const fetchCar = async () => {
     try {
@@ -87,7 +125,12 @@ export default function EditCarPage() {
         purchase_price: data.purchase_price || '',
         sale_price: data.sale_price || '',
         status: data.status || 'disponivel',
-        notes: data.notes || ''
+        notes: data.notes || '',
+        photo_url: data.photo_url || null,
+        additional_costs: (data.additional_costs as AdditionalCost[])?.map(cost => ({
+          ...cost,
+          value: Number(cost.value) || 0
+        })) || []
       })
     } catch (error) {
       console.error('Erro ao buscar carro:', error)
@@ -97,7 +140,22 @@ export default function EditCarPage() {
     }
   }
 
-  const handleInputChange = (field: string, value: string | number) => {
+  const fetchGalleryPhotos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('car_photos')
+        .select('*')
+        .eq('car_id', carId)
+        .order('uploaded_at', { ascending: false })
+
+      if (error) throw error
+      setGalleryPhotos(data || [])
+    } catch (error) {
+      console.error('Erro ao buscar fotos da galeria:', error)
+    }
+  }
+
+  const handleInputChange = (field: string, value: string | number | AdditionalCost[] | null) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -123,7 +181,9 @@ export default function EditCarPage() {
           purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
           sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
           status: formData.status,
-          notes: formData.notes || null,
+          notes: formData.notes,
+          photo_url: formData.photo_url,
+          additional_costs: formData.additional_costs,
           updated_at: new Date().toISOString()
         })
         .eq('id', carId)
@@ -145,9 +205,23 @@ export default function EditCarPage() {
     }
   }
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      router.push('/login')
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    }
+  }
+
   if (loading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
@@ -157,7 +231,12 @@ export default function EditCarPage() {
 
   if (!car) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="text-center py-12">
           <Car className="w-16 h-16 text-text-secondary-light dark:text-text-secondary-dark mx-auto mb-4" />
           <h3 className="text-lg font-medium text-text-primary-light dark:text-text-primary-dark mb-2">
@@ -176,7 +255,12 @@ export default function EditCarPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      onLogout={handleLogout}
+      userRole={profile?.role}
+      userName={profile?.full_name || user?.email || ''}
+      userEmail={user?.email || ''}
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -340,11 +424,11 @@ export default function EditCarPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Euro className="h-5 w-5 mr-2 text-primary-600 dark:text-primary-400" />
-                    Preços
+                    Preços e Custos
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark mb-2">
                         Preço de Compra (€)
@@ -376,8 +460,72 @@ export default function EditCarPage() {
                         Preço para venda do veículo
                       </p>
                     </div>
+                  </div>
 
+                  {/* Divisor */}
+                  <div className="border-t border-border-light dark:border-border-dark"></div>
 
+                  {/* Custos Adicionais */}
+                  <AdditionalCosts
+                    costs={formData.additional_costs}
+                    onChange={(costs) => handleInputChange('additional_costs', costs)}
+                  />
+
+                  {/* Divisor */}
+                  <div className="border-t border-border-light dark:border-border-dark"></div>
+
+                  {/* Resumo Financeiro */}
+                  <div className="bg-surface-light dark:bg-surface-dark p-4 rounded-lg space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary-light dark:text-text-secondary-dark">Preço de Compra:</span>
+                      <span className="font-medium text-text-primary-light dark:text-text-primary-dark">
+                        {(parseFloat(formData.purchase_price) || 0).toLocaleString('pt-PT', {
+                          style: 'currency',
+                          currency: 'EUR'
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary-light dark:text-text-secondary-dark">Custos Adicionais:</span>
+                      <span className="font-medium text-text-primary-light dark:text-text-primary-dark">
+                        {formData.additional_costs.reduce((sum, cost) => sum + (cost.value || 0), 0).toLocaleString('pt-PT', {
+                          style: 'currency',
+                          currency: 'EUR'
+                        })}
+                      </span>
+                    </div>
+                    <div className="border-t border-border-light dark:border-border-dark pt-2 mt-2"></div>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-text-primary-light dark:text-text-primary-dark">Custo Total:</span>
+                      <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                        {((parseFloat(formData.purchase_price) || 0) + formData.additional_costs.reduce((sum, cost) => sum + (cost.value || 0), 0)).toLocaleString('pt-PT', {
+                          style: 'currency',
+                          currency: 'EUR'
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm pt-2 border-t border-border-light dark:border-border-dark mt-2">
+                      <span className="text-text-secondary-light dark:text-text-secondary-dark">Preço de Venda:</span>
+                      <span className="font-medium text-success-600 dark:text-success-400">
+                        {(parseFloat(formData.sale_price) || 0).toLocaleString('pt-PT', {
+                          style: 'currency',
+                          currency: 'EUR'
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary-light dark:text-text-secondary-dark">Lucro Estimado:</span>
+                      <span className={`font-semibold ${
+                        ((parseFloat(formData.sale_price) || 0) - (parseFloat(formData.purchase_price) || 0) - formData.additional_costs.reduce((sum, cost) => sum + (cost.value || 0), 0)) >= 0
+                          ? 'text-success-600 dark:text-success-400'
+                          : 'text-error-600 dark:text-error-400'
+                      }`}>
+                        {((parseFloat(formData.sale_price) || 0) - (parseFloat(formData.purchase_price) || 0) - formData.additional_costs.reduce((sum, cost) => sum + (cost.value || 0), 0)).toLocaleString('pt-PT', {
+                          style: 'currency',
+                          currency: 'EUR'
+                        })}
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -385,6 +533,25 @@ export default function EditCarPage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
+              {/* Galeria de Fotos Unificada */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Galeria de Fotos</CardTitle>
+                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">
+                    Gerencie todas as fotos do veículo e defina a foto de perfil
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <CarPhotosManager
+                    carId={carId}
+                    currentProfilePhotoUrl={formData.photo_url}
+                    galleryPhotos={galleryPhotos}
+                    onPhotosChange={fetchGalleryPhotos}
+                    onProfilePhotoChange={(photoUrl) => handleInputChange('photo_url', photoUrl || '')}
+                  />
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle>Status</CardTitle>
@@ -412,7 +579,7 @@ export default function EditCarPage() {
                   <div className="space-y-4">
                     <Button
                       type="submit"
-                      className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+                      className="w-full bg-primary-800 hover:bg-primary-900 text-white"
                       disabled={saving}
                     >
                       <Save className="h-4 w-4 mr-2" />

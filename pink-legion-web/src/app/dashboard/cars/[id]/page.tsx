@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
@@ -23,6 +24,7 @@ import {
   Euro,
   MapPin
 } from 'lucide-react'
+import { CarCarousel } from '@/components/ui/CarCarousel'
 
 interface Car {
   id: string
@@ -38,6 +40,7 @@ interface Car {
   sale_price?: string
   status: 'disponivel' | 'vendido' | 'reservado'
   notes?: string
+  photo_url?: string | null
   created_at: string
   updated_at: string
 }
@@ -69,14 +72,52 @@ export default function CarDetailsPage() {
   const [documents, setDocuments] = useState<CarDocument[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
 
   useEffect(() => {
+    checkUser()
     if (carId) {
       fetchCarDetails()
       fetchCarPhotos()
       fetchCarDocuments()
     }
   }, [carId])
+
+  const checkUser = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
+      setUser(user)
+      
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (profileData) {
+        setProfile(profileData)
+      }
+    } catch (error) {
+      console.error('Erro ao verificar usuário:', error)
+      router.push('/login')
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      router.push('/login')
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    }
+  }
 
   const fetchCarDetails = async () => {
     try {
@@ -375,7 +416,12 @@ export default function CarDetailsPage() {
 
   if (loading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
@@ -385,7 +431,12 @@ export default function CarDetailsPage() {
 
   if (!car) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="text-center py-12">
           <Car className="w-16 h-16 text-text-secondary-light dark:text-text-secondary-dark mx-auto mb-4" />
           <h3 className="text-lg font-medium text-text-primary-light dark:text-text-primary-dark mb-2">
@@ -404,7 +455,12 @@ export default function CarDetailsPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      onLogout={handleLogout}
+      userRole={profile?.role}
+      userName={profile?.full_name || user?.email || ''}
+      userEmail={user?.email || ''}
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -447,6 +503,39 @@ export default function CarDetailsPage() {
                   Informações do Veículo
                 </CardTitle>
               </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Carrossel de Fotos */}
+                {(() => {
+                  // Combinar foto de perfil + fotos da galeria (evitando duplicação)
+                  const allPhotos: string[] = []
+                  
+                  // Adicionar foto de perfil primeiro
+                  if (car.photo_url) {
+                    allPhotos.push(car.photo_url)
+                  }
+                  
+                  // Adicionar fotos da galeria, exceto se já for a foto de perfil
+                  photos.forEach(photo => {
+                    if (photo.photo_url !== car.photo_url) {
+                      allPhotos.push(photo.photo_url)
+                    }
+                  })
+
+                  return allPhotos.length > 0 ? (
+                    <CarCarousel 
+                      photos={allPhotos} 
+                      altText={`${car.brand} ${car.model}`}
+                    />
+                  ) : (
+                    <div className="w-full h-64 rounded-lg bg-surface-light dark:bg-surface-dark border-2 border-dashed border-border-light dark:border-border-dark flex flex-col items-center justify-center">
+                      <Car className="h-16 w-16 text-text-secondary-light dark:text-text-secondary-dark mb-2" />
+                      <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                        Nenhuma foto disponível
+                      </p>
+                    </div>
+                  )
+                })()}
+              </CardContent>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3">
@@ -530,7 +619,13 @@ export default function CarDetailsPage() {
                 <div className="flex justify-between items-center">
                   <CardTitle className="flex items-center">
                     <ImageIcon className="h-5 w-5 mr-2 text-primary-600 dark:text-primary-400" />
-                    Fotos do Veículo ({photos.length})
+                    Fotos do Veículo ({(() => {
+                      // Calcular número de fotos únicas (evitando duplicação)
+                      const uniquePhotos = new Set()
+                      if (car.photo_url) uniquePhotos.add(car.photo_url)
+                      photos.forEach(photo => uniquePhotos.add(photo.photo_url))
+                      return uniquePhotos.size
+                    })()})
                   </CardTitle>
                   <div>
                     <input
@@ -554,7 +649,7 @@ export default function CarDetailsPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {photos.length === 0 ? (
+                {!car.photo_url && photos.length === 0 ? (
                   <div className="text-center py-8">
                     <ImageIcon className="w-12 h-12 text-text-secondary-light dark:text-text-secondary-dark mx-auto mb-4" />
                     <p className="text-text-secondary-light dark:text-text-secondary-dark">
@@ -563,24 +658,54 @@ export default function CarDetailsPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {photos.map((photo) => (
-                      <div key={photo.id} className="relative group">
+                    {/* Foto de Perfil */}
+                    {car.photo_url && (
+                      <div className="relative group">
                         <img
-                          src={photo.photo_url}
-                          alt={photo.photo_name}
+                          src={car.photo_url}
+                          alt="Foto de Perfil"
                           className="w-full h-32 object-cover rounded-lg"
                         />
+                        <div className="absolute top-2 left-2">
+                          <span className="bg-primary-600 text-white text-xs px-2 py-1 rounded-md font-medium">
+                            Foto de Perfil
+                          </span>
+                        </div>
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                           <Button
-                            variant="destructive"
+                            variant="outline"
                             size="sm"
-                            onClick={() => deletePhoto(photo.id, photo.photo_url)}
+                            onClick={() => router.push(`/dashboard/cars/${carId}/edit`)}
+                            className="bg-white text-primary-600"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Edit className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
-                    ))}
+                    )}
+                    
+                    {/* Fotos da Galeria (exceto a que é foto de perfil) */}
+                    {photos
+                      .filter(photo => photo.photo_url !== car.photo_url)
+                      .map((photo) => (
+                        <div key={photo.id} className="relative group">
+                          <img
+                            src={photo.photo_url}
+                            alt={photo.photo_name}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => deletePhoto(photo.id, photo.photo_url)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    }
                   </div>
                 )}
               </CardContent>

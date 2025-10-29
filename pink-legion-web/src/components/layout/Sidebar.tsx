@@ -80,8 +80,15 @@ export function Sidebar({ isOpen, onClose, userRole, userName, userEmail, onLogo
   // Filtrar navegação baseada no role do usuário
   const filteredNavigation = navigation.filter(item => {
     if (!item.roles) return true // Se não tem restrição de role, mostra para todos
-    if (!userRole) return false // Se não tem role definido, não mostra itens restritos
-    return item.roles.includes(userRole)
+    if (!userRole) {
+      console.warn('Sidebar: userRole is undefined/null, hiding restricted items:', item.name);
+      return false // Se não tem role definido, não mostra itens restritos
+    }
+    const hasAccess = item.roles.includes(userRole);
+    if (!hasAccess) {
+      console.log(`Sidebar: User role '${userRole}' does not have access to '${item.name}' (requires: ${item.roles.join(', ')})`);
+    }
+    return hasAccess;
   })
 
   return (
@@ -118,7 +125,14 @@ export function Sidebar({ isOpen, onClose, userRole, userName, userEmail, onLogo
               // Lógica corrigida para detectar estado ativo
               const isActive = pathname === item.href || 
                               (item.href !== '/dashboard' && pathname.startsWith(item.href + '/')) ||
-                              (item.href === '/dashboard' && pathname === '/dashboard')
+                              (item.href === '/dashboard' && pathname === '/dashboard') ||
+                              // Detectar páginas de edição e detalhes
+                              (item.href === '/cars' && (pathname.startsWith('/dashboard/cars/') || pathname.startsWith('/cars/'))) ||
+                              (item.href === '/clients' && (pathname.startsWith('/dashboard/clients/') || pathname.startsWith('/clients/'))) ||
+                              (item.href === '/dashboard/contracts' && pathname.startsWith('/dashboard/contracts/')) ||
+                              (item.href === '/dashboard/payments' && pathname.startsWith('/dashboard/payments/')) ||
+                              (item.href === '/dashboard/reports' && pathname.startsWith('/dashboard/reports/')) ||
+                              (item.href === '/settings' && pathname.startsWith('/settings/'))
               
               const Icon = item.icon
 

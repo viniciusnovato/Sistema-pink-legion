@@ -101,6 +101,8 @@ export type Database = {
           sold_to: string | null
           sold_at: string | null
           created_by: string | null
+          photo_url: string | null
+          additional_costs: any | null
           created_at: string
           updated_at: string
         }
@@ -119,6 +121,8 @@ export type Database = {
           sold_to?: string | null
           sold_at?: string | null
           created_by?: string | null
+          photo_url?: string | null
+          additional_costs?: any | null
           created_at?: string
           updated_at?: string
         }
@@ -137,6 +141,8 @@ export type Database = {
           sold_to?: string | null
           sold_at?: string | null
           created_by?: string | null
+          photo_url?: string | null
+          additional_costs?: any | null
           created_at?: string
           updated_at?: string
         }

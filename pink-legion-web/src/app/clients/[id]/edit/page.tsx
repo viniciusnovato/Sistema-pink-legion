@@ -7,9 +7,11 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { ArrowLeft, Save, User, CreditCard, MapPin } from 'lucide-react'
+import { ArrowLeft, Save, User as UserIcon, CreditCard, MapPin } from 'lucide-react'
 import { logger } from '@/lib/logger'
 import { getBankByIban, getBicByIban, isValidPortugueseIban, formatIban } from '@/lib/portuguese-banks'
+import { getCurrentUserProfile, type UserProfile } from '@/lib/rbac'
+import type { User } from '@supabase/supabase-js'
 
 interface Client {
   id: string
@@ -59,12 +61,61 @@ export default function EditClientPage() {
   const [ibanInput, setIbanInput] = useState('')
   const [detectedBic, setDetectedBic] = useState('')
   const [detectedBank, setDetectedBank] = useState('')
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
 
   useEffect(() => {
-    if (clientId) {
-      fetchClient()
+    const initializePage = async () => {
+      try {
+        logger.info('Client edit page loaded', 'UI');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          logger.auth('No user found, redirecting to login');
+          router.push('/login');
+          return;
+        }
+        logger.auth('User authenticated in client edit page', { userId: user.id, email: user.email });
+        setUser(user);
+        const userProfile = await getCurrentUserProfile();
+        if (!userProfile) {
+          logger.error('Error fetching user profile or user has no profile', undefined, 'RBAC');
+          logger.auth('User profile is null, sidebar will show limited options', { userId: user.id });
+        } else {
+          logger.supabase('User profile fetched successfully', { profileId: userProfile.id, role: userProfile.role });
+          logger.auth('User role for sidebar filtering', { role: userProfile.role, hasRole: !!userProfile.role });
+        }
+        setProfile(userProfile);
+        if (clientId) {
+          await fetchClient();
+        }
+        setLoading(false);
+      } catch (error) {
+        logger.error('Unexpected error in client edit page initialization', error as Error, 'CLIENTS');
+        setLoading(false);
+      }
+    };
+    initializePage();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        logger.auth(`Auth state change in client edit: ${event}`, { hasSession: !!session });
+        if (event === 'SIGNED_OUT' || !session) {
+          logger.auth('User signed out, redirecting to login');
+          router.push('/login');
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, [clientId, router])
+
+  const handleLogout = async () => {
+    try {
+      logger.auth('User logging out from client edit page');
+      await supabase.auth.signOut();
+      router.push('/login');
+    } catch (error) {
+      logger.error('Error during logout', error as Error, 'AUTH');
     }
-  }, [clientId])
+  }
 
   const fetchClient = async () => {
     try {
@@ -269,7 +320,12 @@ export default function EditClientPage() {
 
   if (loading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-pink-600"></div>
         </div>
@@ -279,7 +335,12 @@ export default function EditClientPage() {
 
   if (!client) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">
             Cliente não encontrado
@@ -290,7 +351,12 @@ export default function EditClientPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      onLogout={handleLogout}
+      userRole={profile?.role}
+      userName={profile?.full_name || user?.email || ''}
+      userEmail={user?.email || ''}
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -314,7 +380,7 @@ export default function EditClientPage() {
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-pink-600 hover:bg-pink-700 text-white"
+            className="bg-gray-700 hover:bg-gray-800 text-white"
           >
             <Save className="h-4 w-4 mr-2" />
             {saving ? 'Guardando...' : 'Guardar Alterações'}
@@ -325,7 +391,7 @@ export default function EditClientPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <User className="h-5 w-5 mr-2" />
+              <UserIcon className="h-5 w-5 mr-2" />
               Informações Pessoais
             </CardTitle>
           </CardHeader>
@@ -653,7 +719,7 @@ export default function EditClientPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <User className="h-5 w-5 mr-2" />
+              <UserIcon className="h-5 w-5 mr-2" />
               Notas Adicionais
             </CardTitle>
           </CardHeader>
@@ -681,7 +747,7 @@ export default function EditClientPage() {
           <Button
             onClick={handleSave}
             disabled={loading}
-            className="flex-1"
+            className="flex-1 bg-gray-700 hover:bg-gray-800 text-white"
           >
             <Save className="h-4 w-4 mr-2" />
             {loading ? 'Guardando...' : 'Guardar Alterações'}

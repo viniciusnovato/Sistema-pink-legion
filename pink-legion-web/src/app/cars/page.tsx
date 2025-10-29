@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -21,6 +22,7 @@ interface Car {
   color: string;
   status: 'available' | 'sold' | 'reserved' | 'maintenance';
   images?: string[];
+  photo_url?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -330,12 +332,30 @@ export default function CarsPage() {
                     {filteredCars.map((car) => (
                       <TableRow key={car.id}>
                         <TableCell>
-                          <div>
-                            <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
-                              {car.brand} {car.model}
-                            </div>
-                            <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
-                              {car.color} • {car.fuel_type} • {car.transmission}
+                          <div className="flex items-center gap-3">
+                            {/* Foto do Carro */}
+                            {car.photo_url ? (
+                              <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                <Image
+                                  src={car.photo_url}
+                                  alt={`${car.brand} ${car.model}`}
+                                  fill
+                                  className="object-cover"
+                                  sizes="64px"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-16 h-16 rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark flex items-center justify-center flex-shrink-0">
+                                <Car className="h-6 w-6 text-text-light-secondary dark:text-text-dark-secondary" />
+                              </div>
+                            )}
+                            <div>
+                              <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
+                                {car.brand} {car.model}
+                              </div>
+                              <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                                {car.color} • {car.fuel_type} • {car.transmission}
+                              </div>
                             </div>
                           </div>
                         </TableCell>

@@ -6,9 +6,11 @@ import { supabase } from '@/lib/supabase'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { ArrowLeft, Edit, User, Phone, Mail, MapPin, Briefcase, FileText, Upload, Trash2, Download, Image as ImageIcon, CreditCard, Calendar, Euro } from 'lucide-react'
+import { ArrowLeft, Edit, User as UserIcon, Phone, Mail, MapPin, Briefcase, FileText, Upload, Trash2, Download, Image as ImageIcon, CreditCard, Calendar, Euro } from 'lucide-react'
 import { logger } from '@/lib/logger'
 import { getBankByIban, getBicByIban, isValidPortugueseIban, formatIban } from '@/lib/portuguese-banks'
+import { getCurrentUserProfile, type UserProfile } from '@/lib/rbac'
+import type { User } from '@supabase/supabase-js'
 
 interface Client {
   id: string;
@@ -25,10 +27,10 @@ interface Client {
   status: string | null;
   created_at: string;
   iban: string | null;
-  street: string | null;
-  number: string | null;
+  address: string | null;
   city: string | null;
-  postal_code: string | null;
+  state: string | null;
+  zip_code: string | null;
   card_number: string | null;
   card_holder_name: string | null;
   card_expiry: string | null;
@@ -65,14 +67,53 @@ export default function ClientPage() {
   const [ibanInput, setIbanInput] = useState('')
   const [detectedBic, setDetectedBic] = useState('')
   const [detectedBank, setDetectedBank] = useState('')
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
 
   useEffect(() => {
-    if (clientId) {
-      fetchClient()
-      fetchPhotos()
-      fetchDocuments()
-    }
-  }, [clientId])
+    const initializePage = async () => {
+      try {
+        logger.info('Client view page loaded', 'UI');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          logger.auth('No user found, redirecting to login');
+          router.push('/login');
+          return;
+        }
+        logger.auth('User authenticated in client view page', { userId: user.id, email: user.email });
+        setUser(user);
+        const userProfile = await getCurrentUserProfile();
+        if (!userProfile) {
+          logger.error('Error fetching user profile or user has no profile', undefined, 'RBAC');
+          logger.auth('User profile is null, sidebar will show limited options', { userId: user.id });
+        } else {
+          logger.supabase('User profile fetched successfully', { profileId: userProfile.id, role: userProfile.role });
+          logger.auth('User role for sidebar filtering', { role: userProfile.role, hasRole: !!userProfile.role });
+        }
+        setProfile(userProfile);
+        if (clientId) {
+          await fetchClient()
+          await fetchPhotos()
+          await fetchDocuments()
+        }
+        setLoading(false);
+      } catch (error) {
+        logger.error('Unexpected error in client view page initialization', error as Error, 'CLIENTS');
+        setLoading(false);
+      }
+    };
+    initializePage();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        logger.auth(`Auth state change in client view: ${event}`, { hasSession: !!session });
+        if (event === 'SIGNED_OUT' || !session) {
+          logger.auth('User signed out, redirecting to login');
+          router.push('/login');
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, [clientId, router])
 
   const fetchClient = async () => {
     try {
@@ -354,9 +395,24 @@ export default function ClientPage() {
     return colors[status as keyof typeof colors] || 'text-gray-600 bg-gray-100'
   }
 
+  const handleLogout = async () => {
+    try {
+      logger.auth('User logging out from client view page');
+      await supabase.auth.signOut();
+      router.push('/login');
+    } catch (error) {
+      logger.error('Error during logout', error as Error, 'AUTH');
+    }
+  }
+
   if (loading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-pink-600"></div>
         </div>
@@ -366,7 +422,12 @@ export default function ClientPage() {
 
   if (!client) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">
             Cliente não encontrado
@@ -377,7 +438,12 @@ export default function ClientPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      onLogout={handleLogout}
+      userRole={profile?.role}
+      userName={profile?.full_name || user?.email || ''}
+      userEmail={user?.email || ''}
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -420,7 +486,7 @@ export default function ClientPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <User className="h-5 w-5 mr-2" />
+              <UserIcon className="h-5 w-5 mr-2" />
               Informações Pessoais
             </CardTitle>
           </CardHeader>
@@ -483,6 +549,37 @@ export default function ClientPage() {
                   </p>
                 </div>
               </div>
+              <div className="flex items-center space-x-3">
+                <MapPin className="h-5 w-5 text-text-secondary-light dark:text-text-secondary-dark" />
+                <div>
+                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Morada</p>
+                  <p className="font-medium">
+                    {(() => {
+                      try {
+                        // Se address é um JSON string, parse e formate
+                        if (client.address && client.address.startsWith('{')) {
+                          const addressObj = JSON.parse(client.address)
+                          const addressParts = [
+                            addressObj.street,
+                            addressObj.number,
+                            addressObj.complement,
+                            addressObj.parish,
+                            addressObj.city,
+                            addressObj.district,
+                            addressObj.postal_code
+                          ].filter(Boolean)
+                          return addressParts.join(', ')
+                        }
+                        // Se address é string simples, use os campos individuais
+                        return [client.address, client.city, client.state, client.zip_code].filter(Boolean).join(', ') || 'Não informado'
+                      } catch {
+                        // Se não conseguir fazer parse, use os campos individuais
+                        return [client.address, client.city, client.state, client.zip_code].filter(Boolean).join(', ') || 'Não informado'
+                      }
+                    })()}
+                  </p>
+                </div>
+              </div>
               
               {/* Dados do Cartão Bancário */}
               {(client.card_number || client.card_holder_name || client.card_expiry || client.card_cvv) && (
@@ -503,7 +600,7 @@ export default function ClientPage() {
                   )}
                   {client.card_holder_name && (
                     <div className="flex items-center space-x-3">
-                      <User className="h-5 w-5 text-text-secondary-light dark:text-text-secondary-dark" />
+                      <UserIcon className="h-5 w-5 text-text-secondary-light dark:text-text-secondary-dark" />
                       <div>
                         <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Nome do Titular</p>
                         <p className="font-medium">{client.card_holder_name}</p>
@@ -928,7 +1025,7 @@ export default function ClientPage() {
                 </p>
                 
                 {/* Morada pré-preenchida do cliente */}
-                {client && client.address && (
+                {client && (client.address || client.city || client.state || client.zip_code) && (
                   <div className="mb-4 p-3 bg-background-light dark:bg-background-dark rounded-lg border">
                     <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-1">
                       Morada registada:
@@ -936,18 +1033,25 @@ export default function ClientPage() {
                     <p className="font-medium text-text-primary-light dark:text-text-primary-dark">
                       {(() => {
                         try {
-                          const addressData = typeof client.address === 'string' 
-                            ? JSON.parse(client.address) 
-                            : client.address;
-                          return [
-                            addressData.street,
-                            addressData.number,
-                            addressData.city,
-                            addressData.postal_code
-                          ].filter(Boolean).join(', ');
-                        } catch (e) {
-                          // Fallback para campos individuais se o JSON estiver corrompido
-                          return [client.street, client.number, client.city, client.postal_code].filter(Boolean).join(', ');
+                          // Se address é um JSON string, parse e formate
+                          if (client.address && client.address.startsWith('{')) {
+                            const addressObj = JSON.parse(client.address)
+                            const addressParts = [
+                              addressObj.street,
+                              addressObj.number,
+                              addressObj.complement,
+                              addressObj.parish,
+                              addressObj.city,
+                              addressObj.district,
+                              addressObj.postal_code
+                            ].filter(Boolean)
+                            return addressParts.join(', ')
+                          }
+                          // Se address é string simples, use os campos individuais
+                          return [client.address, client.city, client.state, client.zip_code].filter(Boolean).join(', ')
+                        } catch {
+                          // Se não conseguir fazer parse, use os campos individuais
+                          return [client.address, client.city, client.state, client.zip_code].filter(Boolean).join(', ')
                         }
                       })()}
                     </p>
