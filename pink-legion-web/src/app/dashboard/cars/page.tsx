@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
@@ -23,6 +24,7 @@ interface Car {
   sale_price?: number
   status: 'disponivel' | 'vendido' | 'reservado'
   notes?: string
+  photo_url?: string | null
   created_at: string
   updated_at: string
 }
@@ -64,6 +66,15 @@ export default function CarsPage() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
+      
+      // Debug: verificar se photo_url está vindo
+      console.log('Carros carregados:', data?.map(car => ({ 
+        id: car.id, 
+        brand: car.brand, 
+        model: car.model,
+        photo_url: car.photo_url 
+      })))
+      
       setCars(data || [])
     } catch (error) {
       console.error('Erro ao buscar carros:', error)
@@ -337,6 +348,26 @@ export default function CarsPage() {
           {filteredCars.map((car) => (
             <Card key={car.id} hover>
               <CardContent className="pt-6">
+                {/* Foto do Veículo */}
+                {(() => {
+                  console.log(`Carro ${car.brand} ${car.model} - photo_url:`, car.photo_url);
+                  return car.photo_url ? (
+                    <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
+                      <Image
+                        src={car.photo_url}
+                        alt={`${car.brand} ${car.model}`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 mb-4 rounded-lg bg-surface-light dark:bg-surface-dark border-2 border-dashed border-border-light dark:border-border-dark flex items-center justify-center">
+                      <Car className="h-12 w-12 text-text-secondary-light dark:text-text-secondary-dark" />
+                    </div>
+                  );
+                })()}
+
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">

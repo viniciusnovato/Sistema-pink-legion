@@ -98,12 +98,50 @@ export default function ContractViewPage() {
   const [carPhotos, setCarPhotos] = useState<CarPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
 
   useEffect(() => {
+    checkUser()
     if (contractId) {
       fetchContractDetails()
     }
   }, [contractId])
+
+  const checkUser = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
+      setUser(user)
+      
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (profileData) {
+        setProfile(profileData)
+      }
+    } catch (error) {
+      console.error('Erro ao verificar usuário:', error)
+      router.push('/login')
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      router.push('/login')
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    }
+  }
 
   const fetchContractDetails = async () => {
     try {
@@ -706,7 +744,12 @@ export default function ContractViewPage() {
 
   if (loading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
@@ -716,7 +759,12 @@ export default function ContractViewPage() {
 
   if (!contract) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <h2 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark mb-2">
@@ -732,7 +780,12 @@ export default function ContractViewPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      onLogout={handleLogout}
+      userRole={profile?.role}
+      userName={profile?.full_name || user?.email || ''}
+      userEmail={user?.email || ''}
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

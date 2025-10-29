@@ -142,6 +142,8 @@ export default function NewContractPage() {
   const [selectedCarId, setSelectedCarId] = useState('')
   const [selectedClientId, setSelectedClientId] = useState('')
   const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
   
   // Form data
   const [salePrice, setSalePrice] = useState('')
@@ -156,8 +158,44 @@ export default function NewContractPage() {
   const [installmentValue, setInstallmentValue] = useState('')
 
   useEffect(() => {
+    checkUser()
     fetchData()
   }, [])
+
+  const checkUser = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
+      setUser(user)
+      
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (profileData) {
+        setProfile(profileData)
+      }
+    } catch (error) {
+      console.error('Erro ao verificar usuário:', error)
+      router.push('/login')
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      router.push('/login')
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    }
+  }
 
   // Função para calcular automaticamente o valor das parcelas
   useEffect(() => {
@@ -657,7 +695,12 @@ export default function NewContractPage() {
 
   if (loading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        onLogout={handleLogout}
+        userRole={profile?.role}
+        userName={profile?.full_name || user?.email || ''}
+        userEmail={user?.email || ''}
+      >
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
@@ -666,7 +709,12 @@ export default function NewContractPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      onLogout={handleLogout}
+      userRole={profile?.role}
+      userName={profile?.full_name || user?.email || ''}
+      userEmail={user?.email || ''}
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
