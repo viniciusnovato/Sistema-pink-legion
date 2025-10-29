@@ -164,18 +164,53 @@ function applyPlaceholders(template: string, data: LibContractData, type: Contra
 
   const sellerAddress = 'Rua do Bacelo, nº 266, 4475-325 Milheirós, Maia – Portugal'
 
+  // Montar endereço completo corretamente
+  const fullAddress = (() => {
+    const parts = []
+    
+    // Adicionar rua/endereço
+    if (data.client.address) {
+      parts.push(data.client.address)
+    }
+    
+    // Adicionar cidade
+    if (data.client.city) {
+      parts.push(data.client.city)
+    }
+    
+    // Adicionar código postal
+    if (data.client.postal_code) {
+      parts.push(data.client.postal_code)
+    }
+    
+    // Adicionar país se houver
+    if (data.client.country && data.client.country !== 'Portugal') {
+      parts.push(data.client.country)
+    }
+    
+    return parts.filter(Boolean).join(', ')
+  })()
+
+  // 🔍 DEBUG - Log da montagem do endereço
+  console.log('🔍 API - Montagem do endereço:', {
+    'data.client.address': data.client.address,
+    'data.client.city': data.client.city,
+    'data.client.postal_code': data.client.postal_code,
+    'fullAddress final': fullAddress
+  })
+
   const placeholders: Record<string, string> = {
     full_name: data.client.full_name || '',
     nif: data.client.nif || '',
     id_number: data.client.id_number || '',
-    address: [data.client.address, data.client.city, data.client.postal_code].filter(Boolean).join(', '),
+    address: fullAddress,
     email: data.client.email || '',
     phone: data.client.phone || '',
     nationality,
     // Aliases for debt confession template
     debtor_full_name: data.client.full_name || '',
     debtor_nif: data.client.nif || '',
-    debtor_address: [data.client.address, data.client.city, data.client.postal_code].filter(Boolean).join(', '),
+    debtor_address: fullAddress,
     debtor_nationality: nationality,
     bank_name: bankName,
     iban,

@@ -246,6 +246,8 @@ export default function EditClientPage() {
         iban: ibanInput || null,
         bank_name: detectedBank || null,
         account_holder: client.full_name,
+        // Serialize address object properly
+        address: client.address ? JSON.stringify(client.address) : null,
         updated_at: new Date().toISOString()
       }
 

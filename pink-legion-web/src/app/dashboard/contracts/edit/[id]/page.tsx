@@ -69,6 +69,13 @@ interface Client {
   email: string
   phone?: string
   address?: string
+  street?: string
+  number?: string
+  city?: string
+  postal_code?: string
+  nationality?: string
+  bank_name?: string
+  iban?: string
   nif?: string
 }
 
@@ -221,6 +228,13 @@ export default function EditContractPage() {
             email,
             phone,
             address,
+            street,
+            number,
+            city,
+            postal_code,
+            nationality,
+            bank_name,
+            iban,
             nif
           )
         `)
@@ -230,6 +244,17 @@ export default function EditContractPage() {
       if (contractError) throw contractError
       
       setContract(contractData)
+      
+      // 🔍 FETCH - LOG COMPLETO dos dados do cliente recebidos do banco
+      console.log('🔍 FETCH - Dados recebidos do banco:', {
+        'clients.id': contractData.clients.id,
+        'clients.full_name': contractData.clients.full_name,
+        'clients.address': contractData.clients.address,
+        'clients.street': contractData.clients.street,
+        'clients.number': contractData.clients.number,
+        'clients.city': contractData.clients.city,
+        'clients.postal_code': contractData.clients.postal_code,
+      })
       
       // Populate form with existing data
       setSalePrice(contractData.total_amount?.toString() || '')
@@ -347,6 +372,8 @@ export default function EditContractPage() {
   const handleRegenerateContract = async () => {
     if (!contract) return
 
+    console.log('🔍 INÍCIO - handleRegenerateContract chamado')
+
     try {
       setRegenerating(true)
 
@@ -398,22 +425,43 @@ export default function EditContractPage() {
         console.error('Error deleting old documents:', deleteError)
       }
 
+      console.log('🔍 ANTES - Vai chamar generateContractPDFs()')
+
       // Generate new PDFs
       await generateContractPDFs()
+
+      console.log('🔍 DEPOIS - generateContractPDFs() completado')
 
       alert('Contrato regenerado com sucesso!')
       router.push(`/dashboard/contracts/${contractId}`)
 
     } catch (error) {
-      console.error('Error regenerating contract:', error)
+      console.error('🔴 ERRO - Error regenerating contract:', error)
       alert('Erro ao regenerar contrato')
     } finally {
+      console.log('🔍 FINALLY - Finalizando regeneração')
       setRegenerating(false)
     }
   }
 
   const generateContractPDFs = async () => {
-    if (!contract) return
+    console.log('🔍🔍🔍 ENTROU em generateContractPDFs()')
+    
+    if (!contract) {
+      console.log('🔴 ERRO - contract é null, saindo...')
+      return
+    }
+
+    // 🔍 DEBUG - Log dos dados do contrato
+    console.log('🔍 DEBUG - Regeneração - Dados do Cliente:', {
+      id: contract.clients.id,
+      full_name: contract.clients.full_name,
+      address_raw: contract.clients.address,
+      street: contract.clients.street,
+      number: contract.clients.number,
+      city: contract.clients.city,
+      postal_code: contract.clients.postal_code,
+    })
 
     const libContractData: LibContractData = {
       client: {
@@ -422,12 +470,29 @@ export default function EditContractPage() {
         email: contract.clients.email.trim(),
         phone: contract.clients.phone?.trim() || '',
         address: (() => {
-          if (!contract.clients.address) return ''
+          // PRIMEIRO: Priorizar campos separados
+          if (contract.clients.street) {
+            const parts = [contract.clients.street]
+            if (contract.clients.number) parts.push(contract.clients.number)
+            // Tentar pegar complemento do JSON se existir
+            if (contract.clients.address && typeof contract.clients.address === 'string') {
+              try {
+                const addr = JSON.parse(contract.clients.address)
+                if (addr.complement) parts.push(addr.complement)
+              } catch {}
+            }
+            return parts.join(', ').trim()
+          }
           
-          if (typeof contract.clients.address === 'string') {
+          // SEGUNDO: Fallback para JSON completo
+          if (contract.clients.address && typeof contract.clients.address === 'string') {
             try {
               const addr = JSON.parse(contract.clients.address)
-              return `${addr.street || ''} ${addr.number || ''}`.trim()
+              const parts = []
+              if (addr.street) parts.push(addr.street)
+              if (addr.number) parts.push(addr.number)
+              if (addr.complement) parts.push(addr.complement)
+              return parts.join(', ').trim()
             } catch {
               return contract.clients.address.trim()
             }
@@ -435,9 +500,13 @@ export default function EditContractPage() {
           return ''
         })(),
         city: (() => {
-          if (!contract.clients.address) return ''
+          // Priorizar campo separado city
+          if (contract.clients.city) {
+            return contract.clients.city
+          }
           
-          if (typeof contract.clients.address === 'string') {
+          // Fallback: tentar ler do campo address JSON
+          if (contract.clients.address && typeof contract.clients.address === 'string') {
             try {
               const addr = JSON.parse(contract.clients.address)
               return addr.city || ''
@@ -448,9 +517,13 @@ export default function EditContractPage() {
           return ''
         })(),
         postal_code: (() => {
-          if (!contract.clients.address) return ''
+          // Priorizar campo separado postal_code
+          if (contract.clients.postal_code) {
+            return contract.clients.postal_code
+          }
           
-          if (typeof contract.clients.address === 'string') {
+          // Fallback: tentar ler do campo address JSON
+          if (contract.clients.address && typeof contract.clients.address === 'string') {
             try {
               const addr = JSON.parse(contract.clients.address)
               return addr.postal_code || ''
@@ -491,6 +564,16 @@ export default function EditContractPage() {
         notes: observations
       }
     }
+
+    // 🔍 DEBUG - Log COMPLETO do address montado
+    console.log('🔍 DEBUG - Address construído:', {
+      'address': libContractData.client.address,
+      'city': libContractData.client.city,
+      'postal_code': libContractData.client.postal_code
+    })
+
+    // 🔍 DEBUG - Log do LibContractData montado
+    console.log('🔍 DEBUG - Regeneração - LibContractData montado:', libContractData.client)
 
     // Gerar PDF via endpoint server-side (Puppeteer)
     const saleResp = await fetch('/api/generate-contract', {

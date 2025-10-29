@@ -170,6 +170,7 @@ export default function EditCarPage() {
           brand: formData.brand,
           model: formData.model,
           license_plate: formData.license_plate,
+          vin: formData.vin || null,
           year: formData.year,
           mileage: formData.mileage,
           color: formData.color,
@@ -177,8 +178,6 @@ export default function EditCarPage() {
           purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
           sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
           status: formData.status,
-          photo_url: formData.photo_url,
-          additional_costs: formData.additional_costs,
           updated_at: new Date().toISOString()
         })
         .eq('id', carId)
