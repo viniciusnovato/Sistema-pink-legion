@@ -408,15 +408,15 @@ export default function ReportsPage() {
                 }}
               >
                 <div className="text-center">
-                  <div className="text-sm font-semibold text-gray-900 dark:text-gray-300">Disponíveis</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Disponíveis</div>
                   <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{disponiveis}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm font-semibold text-neutral-900 dark:text-gray-300">Em financiamento</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Em financiamento</div>
                   <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{emFinanciamento}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm font-semibold text-neutral-900 dark:text-gray-300">Vendidos</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Vendidos</div>
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">{vendidos}</div>
                 </div>
               </div>
@@ -435,15 +435,15 @@ export default function ReportsPage() {
                 }}
               >
                 <div className="text-center">
-                  <div className="text-sm font-semibold text-neutral-900 dark:text-gray-300">Cadastrados</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Cadastrados</div>
                   <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{clients.length}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm font-semibold text-neutral-900 dark:text-gray-300">Com contratos</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Com contratos</div>
                   <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{clientesComContrato}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm font-semibold text-neutral-900 dark:text-gray-300">Vendas concluídas</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Vendas concluídas</div>
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">{clientesComVendaConcluida}</div>
                 </div>
               </div>

@@ -437,24 +437,24 @@ export default function ContractPaymentsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
               <div className="text-center">
                 <div className="text-3xl font-bold text-green-600 dark:text-green-400">{paidPayments.length}</div>
-                <div className="text-sm text-gray-800 dark:text-gray-300">Pagas</div>
+                <div className="text-sm dark:text-gray-300" style={{ color: '#111827' }}>Pagas</div>
                 <div className="text-lg font-medium text-green-600 dark:text-green-400">€{totalPaid.toLocaleString()}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{pendingPayments.length}</div>
-                <div className="text-sm text-gray-800 dark:text-gray-300">Pendentes</div>
+                <div className="text-sm dark:text-gray-300" style={{ color: '#111827' }}>Pendentes</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-red-600 dark:text-red-400">{overduePayments.length}</div>
-                <div className="text-sm text-gray-800 dark:text-gray-300">Atrasadas</div>
+                <div className="text-sm dark:text-gray-300" style={{ color: '#111827' }}>Atrasadas</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{payments.length}</div>
-                <div className="text-sm text-gray-800 dark:text-gray-300">Total</div>
+                <div className="text-sm dark:text-gray-300" style={{ color: '#111827' }}>Total</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-medium text-red-600 dark:text-red-400">€{totalPending.toLocaleString()}</div>
-                <div className="text-sm text-gray-800 dark:text-gray-300">A Receber</div>
+                <div className="text-sm dark:text-gray-300" style={{ color: '#111827' }}>A Receber</div>
               </div>
             </div>
           </CardContent>
