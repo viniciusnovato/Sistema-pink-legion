@@ -1,0 +1,86 @@
+RELATÓRIO DETALHADO – FEATURES DOS ÚLTIMOS 3 PRs
+
+Resumo Executivo
+- PR #4: sem novas funcionalidades (apenas ajuste de variante/estilo de botão na página de edição de carro).
+- PR #3: introduz detecção de tema (dark/light) com reação a mudanças, integra autenticação/perfil do usuário em páginas do dashboard e melhora a navegação lateral com checagem de roles e estado ativo mais preciso.
+- PR #2: adiciona gestão completa de fotos de veículos (upload, galeria, foto de perfil, carrossel e contagem sem duplicidades), novo campo photo_url e exibição otimizada de imagens; introduz custos adicionais com cálculos e resumo financeiro; melhora a apresentação/normalização de endereço de clientes; e adiciona otimizações e políticas em Next.js (imagens e CSP).
+
+Detalhamento por PR
+
+PR #4 – Ajuste visual (sem novas features)
+- Alteração localizada em `pink-legion-web/src/app/dashboard/cars/[id]/edit/page.tsx` trocando a variante do botão de submit para `outline` e simplificando classes. Não há impacto funcional.
+
+PR #3 – Tema dinâmico, contexto de usuário e navegação (features)
+1) Suporte a modo escuro/claro com detecção automática e reação a mudanças de tema
+   - Páginas afetadas:
+     • `dashboard/contracts/[id]/page.tsx`: adiciona `isDarkMode` e `MutationObserver` para refletir mudanças de `document.documentElement.classList` e ajustar cores/componentes.
+     • `dashboard/payments/[id]/page.tsx` e `dashboard/payments/page.tsx`: mesma abordagem para métricas e cartões de resumo.
+     • `dashboard/reports/page.tsx`: cartões de indicadores (valores e contagens) passam a ajustar cores/fundos conforme tema.
+   - Benefício: UI mais consistente em dark/light mode, com atualização automática sem recarregar página.
+
+2) Integração de autenticação e perfil do usuário (contexto de user + profile)
+   - Páginas com checagem de usuário, carregamento de `profile` e fallback para `/login`:
+     • `dashboard/contracts/[id]/page.tsx`, `dashboard/contracts/page.tsx`, `dashboard/contracts/edit/[id]/page.tsx`, `dashboard/contracts/new/page.tsx`
+     • `dashboard/payments/[id]/page.tsx`, `dashboard/payments/page.tsx`
+     • `settings/page.tsx`
+   - Padrões adotados:
+     • Recupera user via `supabase.auth.getUser()`.
+     • Carrega perfil do usuário (tabela `profiles`) para derivar `role`, nome e e-mail exibidos.
+     • Injeta `onLogout`, `userRole`, `userName`, `userEmail` no `DashboardLayout`.
+     • Redireciona para `/login` em ausência de sessão e reage a `onAuthStateChange`.
+   - Benefício: base para RBAC no dashboard, experiência consistente de sessão e logout centralizado.
+
+3) Navegação lateral com RBAC e estado ativo aprimorado
+   - Arquivo: `src/components/layout/Sidebar.tsx`.
+   - Features:
+     • Filtragem de itens por `roles`. Itens sem `roles` são públicos; sem role do usuário, itens restritos não aparecem.
+     • Logs de diagnóstico quando `userRole` indefinido ou sem acesso ao item.
+     • Lógica de “ativo” expandida para detectar rotas de detalhes/edição (e.g. `/dashboard/cars/[id]`, `/dashboard/clients/[id]`, `/dashboard/contracts/...`).
+   - Benefício: menu coerente com permissões e indicador de página atual mais confiável.
+
+PR #2 – Gestão de fotos, custos adicionais, dados de clientes e otimizações (features)
+1) Gestão completa de fotos de veículos
+   - Novos componentes:
+     • `CarPhotosManager.tsx`: gerencia upload múltiplo (drag & drop e input), galeria, exclusão, definição/remoção de foto de perfil. Unifica fotos únicas (galeria + perfil) evitando duplicidade.
+     • `CarPhotoUpload.tsx`: upload controlado de foto de perfil com validação (tipo/tamanho), preview local e envio ao Storage.
+     • `CarCarousel.tsx`: carrossel com miniaturas, navegação anterior/próximo e contador de fotos.
+     • `CarGallery.tsx`: grid de galeria com ações (definir perfil, excluir).
+   - Páginas integradas:
+     • `dashboard/cars/[id]/edit/page.tsx`: seção “Galeria de Fotos” unificada, define `photo_url` e atualiza galeria via Supabase Storage + tabela `car_photos`.
+     • `dashboard/cars/[id]/page.tsx`: carrossel no detalhamento do carro; contagem de fotos sem duplicar a foto de perfil; upload e exclusão nas seções correspondentes.
+     • `dashboard/cars/page.tsx` e `app/cars/page.tsx`: listagens passam a mostrar a `photo_url` com `next/image` (tamanhos e placeholders), com fallback visual quando ausente.
+   - Persistência/Tipos:
+     • `supabase.ts`: adiciona campos `photo_url` e `additional_costs` no tipo de `cars` (select/insert/update).
+   - Benefício: gestão moderna e completa de mídia, com melhor UX e performance em imagens.
+
+2) Custos adicionais do veículo + resumo financeiro
+   - Componente: `AdditionalCosts.tsx` (criação/remoção/edição de custos, validação de valores não negativos, totalizador).
+   - Integração na edição de carro: `dashboard/cars/[id]/edit/page.tsx`.
+     • Campos de preço de compra/venda reorganizados.
+     • Inclusão de “Custos Adicionais”, resumo de custo total, preço de venda e lucro estimado.
+   - Benefício: maior controle financeiro por veículo e visibilidade do impacto de custos no lucro.
+
+3) Dados de clientes e endereço mais robusto
+   - Páginas: `clients/[id]/page.tsx` e `clients/[id]/edit/page.tsx`.
+   - Features:
+     • Integração de autenticação/perfil (role) e logout no layout, como no PR #3.
+     • Formatação de endereço resiliente: tenta parse de JSON em `client.address` (quando houver), monta string legível com campos opcionais; fallback para campos simples (`address`, `city`, `state`, `zip_code`).
+   - Benefício: exibição confiável da morada mesmo com dados heterogêneos e integração de contexto do usuário.
+
+4) Otimizações e políticas em Next.js (imagens e segurança)
+   - Arquivo: `pink-legion-web/next.config.ts`.
+   - Ações:
+     • `images.formats`: habilita AVIF/WEBP.
+     • `deviceSizes`/`imageSizes`: tamanhos definidos para melhor responsividade e cache.
+     • `minimumCacheTTL`: cache mínimo de 60s para imagens.
+     • `contentSecurityPolicy` reestrita (default-src self; script-src 'none'; sandbox) e `contentDispositionType: 'attachment'` para downloads.
+   - Benefício: performance de imagem e postura de segurança mais rígida.
+
+5) Outras melhorias relevantes
+   - `contracts/[id]/page.tsx`: botão “Alterar Informações” refeito com acessibilidade (foco/aria) e classes consistentes.
+   - `components/ui/Card.tsx` e `components/dashboard/MetricCard.tsx`: pequenos ajustes de hierarquia de cores legíveis (não cosmético), alinhando com tokens de texto claros/escuros.
+
+Observações finais
+- PR #4 foi puramente visual, sem alteração de comportamento.
+- PR #3 consolidou base de tema dinâmico e sessão/role do usuário no dashboard, essencial para RBAC e consistência.
+- PR #2 trouxe os maiores avanços funcionais: mídia de veículos e finanças por carro, junto de refinamentos de dados de clientes e hardening de imagens/CSP no Next.js.

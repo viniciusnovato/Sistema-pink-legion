@@ -1,0 +1,13 @@
+PR #4 – Sem novas features relevantes (apenas ajustes visuais em botão na página de edição de carro).
+
+PR #3 – Novas features
+- Suporte a modo escuro/claro com detecção automática e reação a mudanças de tema em páginas de Contratos e Pagamentos.
+- Integração de contexto do usuário (auth) e perfil em várias páginas do dashboard (contratos, pagamentos, relatórios, configurações), com logout e exibição de informações do usuário.
+- Melhorias na navegação lateral com verificação de roles e detecção mais precisa de item ativo.
+
+PR #2 – Novas features
+- Gestão completa de fotos de veículos: upload para Storage, galeria, definição de foto de perfil, contagem sem duplicidade e carrossel de visualização.
+- Novo campo photo_url no carro e exibição de imagens nas listas e detalhes (com otimização via next/image).
+- Custos adicionais do veículo com componente dedicado, cálculo automático (custo total e lucro estimado) e resumo financeiro na edição.
+- Ajustes de dados de clientes com formatação de endereço mais robusta e integração de perfil/role do usuário nas páginas de Clientes.
+- Otimizações e políticas no Next.js: formatos de imagem AVIF/WEBP, tamanhos de imagem, TTL mínimo de cache e CSP mais restritiva.

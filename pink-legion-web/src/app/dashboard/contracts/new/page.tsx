@@ -7,7 +7,8 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import { ArrowLeft, Car, User, Calculator, Download } from 'lucide-react'
+import { ContractVideoUpload } from '@/components/ui/ContractVideoUpload'
+import { ArrowLeft, Car, User, Calculator, Download, Video } from 'lucide-react'
 // Removendo gerador antigo baseado em jsPDF; utilizando API server-side
 import { generateUniqueFileName } from '@/lib/fileUtils'
 
@@ -155,6 +156,7 @@ export default function NewContractPage() {
   const [observations, setObservations] = useState('')
   const [includeDebtConfession, setIncludeDebtConfession] = useState(false)
   const [firstPaymentDate, setFirstPaymentDate] = useState('')
+  const [videoUrl, setVideoUrl] = useState<string | null>(null)
   
   // Campos para cálculo de parcelas
   const [downPayment, setDownPayment] = useState('')
@@ -322,6 +324,7 @@ export default function NewContractPage() {
         status: 'ativo', // ✅ Adicionando campo status explicitamente
         contract_date: new Date().toISOString().split('T')[0], // ✅ Formato DATE correto (YYYY-MM-DD)
         first_payment_date: firstPaymentDate || null,
+        video_url: videoUrl,
         created_by: user.id // ✅ Adicionando created_by
       }
 
@@ -1022,8 +1025,27 @@ export default function NewContractPage() {
                 Incluir Confissão de Dívida
               </Label>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="flex justify-end">
+        {/* Vídeo do Contrato */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-text-primary-light dark:text-text-primary-dark">
+              <Video className="h-5 w-5" />
+              Vídeo do Contrato
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ContractVideoUpload
+              currentVideoUrl={videoUrl}
+              onVideoChange={setVideoUrl}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Botão de Gerar */}
+        <div className="flex justify-end">
               <Button
                 onClick={handleGenerateContract}
                 disabled={!selectedCar || !selectedClient || !salePrice}

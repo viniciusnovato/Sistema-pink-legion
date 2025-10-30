@@ -24,7 +24,8 @@ import {
   MapPin,
   CreditCard,
   Trash2,
-  Edit
+  Edit,
+  Video
 } from 'lucide-react'
 
 interface Contract {
@@ -38,6 +39,7 @@ interface Contract {
   installment_amount?: number
   contract_type: string
   contract_number: string
+  video_url?: string | null
   created_at: string
   cars: {
     id: string
@@ -1436,6 +1438,56 @@ export default function ContractViewPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Vídeo do Contrato */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Video className="h-5 w-5" />
+              Vídeo do Contrato
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {contract?.video_url ? (
+              <div className="space-y-4">
+                <video
+                  src={contract.video_url}
+                  controls
+                  className="w-full rounded-lg border border-border-light dark:border-border-dark"
+                >
+                  Seu navegador não suporta a reprodução de vídeo.
+                </video>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                    Vídeo da assinatura do contrato
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const link = document.createElement('a')
+                      link.href = contract.video_url!
+                      link.download = `video-contrato-${contract.contract_number}.mp4`
+                      document.body.appendChild(link)
+                      link.click()
+                      document.body.removeChild(link)
+                    }}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Baixar Vídeo
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-border-light dark:border-border-dark rounded-lg">
+                <Video className="h-16 w-16 text-text-secondary-light dark:text-text-secondary-dark mb-4" />
+                <p className="text-text-secondary-light dark:text-text-secondary-dark">
+                  Nenhum vídeo associado a este contrato
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   )
