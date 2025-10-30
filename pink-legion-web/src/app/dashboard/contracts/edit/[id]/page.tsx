@@ -7,9 +7,10 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import { ArrowLeft, Car, User, Calculator, Download, Trash2, Save } from 'lucide-react'
+import { ArrowLeft, Car, User, Calculator, Download, Trash2, Save, Video } from 'lucide-react'
 // Substituindo gerador jsPDF por chamada ao endpoint de geração de PDF
 import { generateUniqueFileName } from '@/lib/fileUtils'
+import { ContractVideoUpload } from '@/components/ui/ContractVideoUpload'
 
 // Component definitions (same as new contract page)
 const Label = ({ htmlFor, children, className }: { htmlFor?: string, children: React.ReactNode, className?: string }) => (
@@ -90,6 +91,7 @@ interface Contract {
   installment_amount?: number
   contract_type: string
   contract_number: string
+  video_url?: string | null
   created_at: string
   cars: Car
   clients: Client
@@ -155,6 +157,7 @@ export default function EditContractPage() {
   const [numberOfInstallments, setNumberOfInstallments] = useState('')
   const [installmentValue, setInstallmentValue] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('transferencia_bancaria')
+  const [videoUrl, setVideoUrl] = useState<string | null>(null)
 
   const checkUser = async () => {
     try {
@@ -261,6 +264,7 @@ export default function EditContractPage() {
       setDownPayment(contractData.down_payment?.toString() || '')
       setNumberOfInstallments(contractData.installments?.toString() || '')
       setInstallmentValue(contractData.installment_amount?.toString() || '')
+      setVideoUrl(contractData.video_url || null)
 
     } catch (error) {
       console.error('Error fetching contract:', error)
@@ -282,6 +286,7 @@ export default function EditContractPage() {
         financed_amount: parseFloat(salePrice) - (parseFloat(downPayment) || 0),
         installments: parseInt(numberOfInstallments) || 0,
         installment_amount: parseFloat(installmentValue) || 0,
+        video_url: videoUrl,
       }
 
       // Verificar se houve mudanças nas parcelas
@@ -921,6 +926,23 @@ export default function EditContractPage() {
                   className="w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px]"
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Vídeo do Contrato */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Video className="h-5 w-5" />
+                Vídeo do Contrato
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ContractVideoUpload
+                currentVideoUrl={videoUrl}
+                onVideoChange={setVideoUrl}
+                contractId={contractId}
+              />
             </CardContent>
           </Card>
         </div>

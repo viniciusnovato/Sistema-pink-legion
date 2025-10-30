@@ -225,6 +225,7 @@ export type Database = {
           status: 'ativo' | 'quitado' | 'cancelado'
           contract_date: string
           first_payment_date: string | null
+          video_url: string | null
           created_by: string | null
           created_at: string
           updated_at: string
@@ -244,6 +245,7 @@ export type Database = {
           status?: 'ativo' | 'quitado' | 'cancelado'
           contract_date?: string
           first_payment_date?: string | null
+          video_url?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -263,6 +265,7 @@ export type Database = {
           status?: 'ativo' | 'quitado' | 'cancelado'
           contract_date?: string
           first_payment_date?: string | null
+          video_url?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string

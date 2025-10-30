@@ -166,6 +166,7 @@ export type Database = {
           status: 'gerado' | 'assinado' | 'concluido' | 'cancelado'
           contract_pdf_url: string | null
           signed_contract_url: string | null
+          video_url: string | null
           contract_date: string
           signed_at: string | null
           completed_at: string | null
@@ -184,6 +185,7 @@ export type Database = {
           status?: 'gerado' | 'assinado' | 'concluido' | 'cancelado'
           contract_pdf_url?: string | null
           signed_contract_url?: string | null
+          video_url?: string | null
           contract_date?: string
           signed_at?: string | null
           completed_at?: string | null
@@ -202,6 +204,7 @@ export type Database = {
           status?: 'gerado' | 'assinado' | 'concluido' | 'cancelado'
           contract_pdf_url?: string | null
           signed_contract_url?: string | null
+          video_url?: string | null
           contract_date?: string
           signed_at?: string | null
           completed_at?: string | null

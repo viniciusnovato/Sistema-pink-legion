@@ -13,5 +13,8 @@ export {
   StyledTable 
 } from './Table';
 
+// Upload Components
+export { ContractVideoUpload } from './ContractVideoUpload';
+
 // Theme Components
 export { ThemeToggle } from './ThemeToggle';
