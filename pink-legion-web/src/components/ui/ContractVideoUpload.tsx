@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
-import { Upload, X, Loader2, Video, FileVideo } from 'lucide-react'
+import { Upload, X, Loader2, Video } from 'lucide-react'
 
 interface ContractVideoUploadProps {
   currentVideoUrl?: string | null
@@ -120,17 +120,6 @@ export function ContractVideoUpload({
     }
   }
 
-  const handleDownload = () => {
-    if (previewUrl) {
-      const link = document.createElement('a')
-      link.href = previewUrl
-      link.download = 'video-contrato.mp4'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -138,28 +127,16 @@ export function ContractVideoUpload({
           Vídeo do Contrato
         </label>
         {previewUrl && (
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleDownload}
-              disabled={uploading}
-            >
-              <FileVideo className="h-4 w-4 mr-1" />
-              Baixar
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleRemoveVideo}
-              disabled={uploading}
-            >
-              <X className="h-4 w-4 mr-1" />
-              Remover
-            </Button>
-          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleRemoveVideo}
+            disabled={uploading}
+          >
+            <X className="h-4 w-4 mr-1" />
+            Remover
+          </Button>
         )}
       </div>
 

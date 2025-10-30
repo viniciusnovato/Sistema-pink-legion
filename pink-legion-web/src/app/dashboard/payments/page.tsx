@@ -325,7 +325,7 @@ export default function PaymentsPage() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Pagamentos</h1>
+            <h1 className="text-3xl font-bold" style={{color: isDarkMode ? '#ffffff' : '#111827'}}>Pagamentos</h1>
             <p className="text-gray-600">Gerencie parcelas e pagamentos dos contratos</p>
           </div>
         </div>

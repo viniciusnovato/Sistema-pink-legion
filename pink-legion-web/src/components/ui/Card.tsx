@@ -1,4 +1,4 @@
-import { HTMLAttributes, forwardRef } from 'react'
+import { HTMLAttributes, forwardRef, useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -54,16 +54,33 @@ const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 CardHeader.displayName = 'CardHeader'
 
 const CardTitle = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    <h3
-      ref={ref}
-      className={cn(
-        'text-xl font-bold leading-tight tracking-tight text-neutral-900 dark:text-text-primary-dark transition-colors duration-200',
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, ...props }, ref) => {
+    const [isDark, setIsDark] = useState(false)
+    
+    useEffect(() => {
+      const checkTheme = () => {
+        setIsDark(document.documentElement.classList.contains('dark'))
+      }
+      
+      checkTheme()
+      const observer = new MutationObserver(checkTheme)
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+      
+      return () => observer.disconnect()
+    }, [])
+    
+    return (
+      <h3
+        ref={ref}
+        className={cn(
+          'text-xl font-bold leading-tight tracking-tight transition-colors duration-200',
+          className
+        )}
+        style={{color: isDark ? '#ffffff' : '#111827'}}
+        {...props}
+      />
+    )
+  }
 )
 
 CardTitle.displayName = 'CardTitle'

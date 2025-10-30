@@ -2,11 +2,16 @@ import { NextRequest } from 'next/server'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
-import puppeteer from 'puppeteer-core'
+import puppeteerCore from 'puppeteer-core'
 import chromium from '@sparticuz/chromium'
 import path from 'path'
 import fs from 'fs/promises'
 import { getBicByIban } from '@/lib/portuguese-banks'
+
+// Import puppeteer for development (includes Chromium)
+const puppeteer = process.env.NODE_ENV === 'production' 
+  ? puppeteerCore 
+  : require('puppeteer')
 
 type ContractType = 'sale' | 'debt_confession'
 
@@ -290,7 +295,7 @@ export async function POST(req: NextRequest) {
         ],
       executablePath: process.env.NODE_ENV === 'production' 
         ? await chromium.executablePath() 
-        : undefined,
+        : undefined, // puppeteer (not puppeteer-core) will use bundled Chromium in dev
       headless: true
     })
     const page = await browser.newPage()
