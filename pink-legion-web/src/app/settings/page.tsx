@@ -41,6 +41,7 @@ export default function SettingsPage() {
     init()
   }, [router])
 
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut()
@@ -95,8 +96,8 @@ export default function SettingsPage() {
         onLogout={handleLogout}
       >
         <div className="p-8">
-          <h1 className="text-2xl font-semibold">Configurações</h1>
-          <p className="mt-4 text-gray-600">Carregando...</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Configurações</h1>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Carregando...</p>
         </div>
       </DashboardLayout>
     )
@@ -111,11 +112,13 @@ export default function SettingsPage() {
     >
       <div className="p-8">
         <div className="max-w-3xl mx-auto space-y-8">
-          <h1 className="text-3xl font-bold">Configurações</h1>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">Configurações</h1>
 
           {/* Informações do Usuário */}
-          <section className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Informações do Usuário</h2>
+          <section 
+            className="p-6 rounded-lg shadow border bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)]"
+          >
+            <h2 className="text-xl font-semibold mb-4 text-[var(--text-primary)]">Informações do Usuário</h2>
             {user && profile ? (
               <div className="space-y-2 text-sm">
                 <p><span className="font-medium">Nome:</span> {profile.full_name}</p>
@@ -125,29 +128,31 @@ export default function SettingsPage() {
                 <p><span className="font-medium">ID:</span> {profile.id}</p>
               </div>
             ) : (
-              <p className="text-gray-600">Não foi possível carregar seu perfil.</p>
+              <p className="text-[var(--text-secondary)]">Não foi possível carregar seu perfil.</p>
             )}
           </section>
 
           {/* Trocar Senha */}
-          <section className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Trocar Senha</h2>
+          <section 
+            className="p-6 rounded-lg shadow border bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)]"
+          >
+            <h2 className="text-xl font-semibold mb-4 text-[var(--text-primary)]">Trocar Senha</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Nova Senha</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)]">Nova Senha</label>
                 <input
                   type="password"
-                  className="mt-1 w-full rounded border px-3 py-2"
+                  className="mt-1 w-full rounded border px-3 py-2 bg-[var(--surface)] text-[var(--text-primary)] placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-[var(--border)]"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Digite a nova senha"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Confirmar Senha</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)]">Confirmar Senha</label>
                 <input
                   type="password"
-                  className="mt-1 w-full rounded border px-3 py-2"
+                  className="mt-1 w-full rounded border px-3 py-2 bg-[var(--surface)] text-[var(--text-primary)] placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-[var(--border)]"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirme a nova senha"
@@ -155,7 +160,7 @@ export default function SettingsPage() {
               </div>
             </div>
             {message && (
-              <p className="mt-3 text-sm text-gray-700">{message}</p>
+              <p className="mt-3 text-sm text-[var(--text-primary)]">{message}</p>
             )}
             <button
               onClick={handleChangePassword}

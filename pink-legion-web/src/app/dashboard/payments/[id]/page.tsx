@@ -82,6 +82,7 @@ export default function ContractPaymentsPage() {
   // Filters must be declared before any conditional returns to respect React Rules of Hooks
   const [statusFilter, setStatusFilter] = useState<'all' | 'pago' | 'pendente' | 'atrasado'>('all')
   const [overdueOnly, setOverdueOnly] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
   useEffect(() => {
     if (contractId) {
@@ -89,6 +90,25 @@ export default function ContractPaymentsPage() {
       fetchPayments()
     }
   }, [contractId])
+
+  useEffect(() => {
+    // Detectar tema atual
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark')
+      setIsDarkMode(isDark)
+    }
+    
+    checkTheme()
+    
+    // Observar mudanças no tema
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+    
+    return () => observer.disconnect()
+  }, [])
 
   const fetchContract = async () => {
     try {
@@ -416,25 +436,25 @@ export default function ContractPaymentsPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-600">{paidPayments.length}</div>
-                <div className="text-sm text-gray-600">Pagas</div>
-                <div className="text-lg font-medium text-green-600">€{totalPaid.toLocaleString()}</div>
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400">{paidPayments.length}</div>
+                <div className="text-sm text-gray-800 dark:text-gray-300">Pagas</div>
+                <div className="text-lg font-medium text-green-600 dark:text-green-400">€{totalPaid.toLocaleString()}</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-600">{pendingPayments.length}</div>
-                <div className="text-sm text-gray-600">Pendentes</div>
+                <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{pendingPayments.length}</div>
+                <div className="text-sm text-gray-800 dark:text-gray-300">Pendentes</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-red-600">{overduePayments.length}</div>
-                <div className="text-sm text-gray-600">Atrasadas</div>
+                <div className="text-3xl font-bold text-red-600 dark:text-red-400">{overduePayments.length}</div>
+                <div className="text-sm text-gray-800 dark:text-gray-300">Atrasadas</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600">{payments.length}</div>
-                <div className="text-sm text-gray-600">Total</div>
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{payments.length}</div>
+                <div className="text-sm text-gray-800 dark:text-gray-300">Total</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-medium text-red-600">€{totalPending.toLocaleString()}</div>
-                <div className="text-sm text-gray-600">A Receber</div>
+                <div className="text-lg font-medium text-red-600 dark:text-red-400">€{totalPending.toLocaleString()}</div>
+                <div className="text-sm text-gray-800 dark:text-gray-300">A Receber</div>
               </div>
             </div>
           </CardContent>
