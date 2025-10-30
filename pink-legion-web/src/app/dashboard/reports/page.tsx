@@ -67,6 +67,7 @@ export default function ReportsPage() {
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'ativo' | 'concluido' | 'cancelado'>('all')
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
   useEffect(() => {
     const getUser = async () => {
@@ -126,6 +127,25 @@ export default function ReportsPage() {
     
     getUser()
     fetchAll()
+  }, [])
+
+  useEffect(() => {
+    // Detectar tema atual
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark')
+      setIsDarkMode(isDark)
+    }
+    
+    checkTheme()
+    
+    // Observar mudanças no tema
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+    
+    return () => observer.disconnect()
   }, [])
 
   const normalizeDate = (d: Date) => {
@@ -286,29 +306,89 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <div className="text-center p-4 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">Valor Total Vendido</div>
-                <div className="text-2xl font-bold text-green-600">€{valorTotalVendido.toLocaleString()}</div>
+              <div 
+                className="text-center p-4 rounded"
+                style={{
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb'
+                }}
+              >
+                <div
+                  className="text-sm font-semibold dark:text-gray-300"
+                  style={{ color: !isDarkMode ? '#111827' : undefined }}
+                >
+                  Valor Total Vendido
+                </div>
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">€{valorTotalVendido.toLocaleString()}</div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">Valor Financiado</div>
-                <div className="text-2xl font-bold text-blue-600">€{valorFinanciado.toLocaleString()}</div>
+              <div 
+                className="text-center p-4 rounded"
+                style={{
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb'
+                }}
+              >
+                <div
+                  className="text-sm font-semibold dark:text-gray-300"
+                  style={{ color: !isDarkMode ? '#111827' : undefined }}
+                >
+                  Valor Financiado
+                </div>
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">€{valorFinanciado.toLocaleString()}</div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">Entradas Pagas</div>
-                <div className="text-2xl font-bold text-orange-600">€{entradasPagas.toLocaleString()}</div>
+              <div 
+                className="text-center p-4 rounded"
+                style={{
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb'
+                }}
+              >
+                <div
+                  className="text-sm font-semibold dark:text-gray-300"
+                  style={{ color: !isDarkMode ? '#111827' : undefined }}
+                >
+                  Entradas Pagas
+                </div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">€{entradasPagas.toLocaleString()}</div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">Valor já recebido</div>
-                <div className="text-2xl font-bold text-green-700">€{pagamentosRecebidos.toLocaleString()}</div>
+              <div 
+                className="text-center p-4 rounded"
+                style={{
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb'
+                }}
+              >
+                <div
+                  className="text-sm font-semibold dark:text-gray-300"
+                  style={{ color: !isDarkMode ? '#111827' : undefined }}
+                >
+                  Valor já recebido
+                </div>
+                <div className="text-2xl font-bold text-green-700 dark:text-green-400">€{pagamentosRecebidos.toLocaleString()}</div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">Valor a receber</div>
-                <div className="text-2xl font-bold text-red-600">€{valorAReceber.toLocaleString()}</div>
+              <div 
+                className="text-center p-4 rounded"
+                style={{
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb'
+                }}
+              >
+                <div
+                  className="text-sm font-semibold dark:text-gray-300"
+                  style={{ color: !isDarkMode ? '#111827' : undefined }}
+                >
+                  Valor a receber
+                </div>
+                <div className="text-2xl font-bold text-red-600 dark:text-red-400">€{valorAReceber.toLocaleString()}</div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">Parcelas (Rec/ Pend/ Atr)</div>
-                <div className="text-lg font-semibold text-gray-800">{parcelasRecebidas.length} / {parcelasPendentes.length} / {parcelasAtrasadas.length}</div>
+              <div 
+                className="text-center p-4 rounded"
+                style={{
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb'
+                }}
+              >
+                <div
+                  className="text-sm font-semibold dark:text-gray-300"
+                  style={{ color: !isDarkMode ? '#111827' : undefined }}
+                >
+                  Parcelas (Rec/ Pend/ Atr)
+                </div>
+                <div className="text-lg font-semibold text-gray-800 dark:text-gray-200">{parcelasRecebidas.length} / {parcelasPendentes.length} / {parcelasAtrasadas.length}</div>
               </div>
             </div>
           </CardContent>
@@ -321,18 +401,23 @@ export default function ReportsPage() {
               <CardTitle className="flex items-center gap-2"><Car className="h-5 w-5" />Carros</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded">
+              <div 
+                className="grid grid-cols-3 gap-4 p-4 rounded"
+                style={{
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb'
+                }}
+              >
                 <div className="text-center">
-                  <div className="text-sm text-gray-600">Disponíveis</div>
-                  <div className="text-2xl font-bold text-blue-600">{disponiveis}</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Disponíveis</div>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{disponiveis}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm text-gray-600">Em financiamento</div>
-                  <div className="text-2xl font-bold text-orange-600">{emFinanciamento}</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Em financiamento</div>
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{emFinanciamento}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm text-gray-600">Vendidos</div>
-                  <div className="text-2xl font-bold text-green-600">{vendidos}</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Vendidos</div>
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">{vendidos}</div>
                 </div>
               </div>
             </CardContent>
@@ -343,18 +428,23 @@ export default function ReportsPage() {
               <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" />Clientes</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded">
+              <div 
+                className="grid grid-cols-3 gap-4 p-4 rounded"
+                style={{
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb'
+                }}
+              >
                 <div className="text-center">
-                  <div className="text-sm text-gray-600">Cadastrados</div>
-                  <div className="text-2xl font-bold text-blue-600">{clients.length}</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Cadastrados</div>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{clients.length}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm text-gray-600">Com contratos</div>
-                  <div className="text-2xl font-bold text-orange-600">{clientesComContrato}</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Com contratos</div>
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{clientesComContrato}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm text-gray-600">Vendas concluídas</div>
-                  <div className="text-2xl font-bold text-green-600">{clientesComVendaConcluida}</div>
+                  <div className="text-sm font-semibold dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Vendas concluídas</div>
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">{clientesComVendaConcluida}</div>
                 </div>
               </div>
             </CardContent>

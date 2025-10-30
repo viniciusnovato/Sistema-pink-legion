@@ -52,7 +52,7 @@ export function MetricCard({
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <p className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">
+            <p className="text-sm font-medium text-neutral-900 dark:text-text-secondary-dark mb-1">
               {title}
             </p>
             <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">

@@ -77,6 +77,7 @@ export default function PaymentsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [overdueOnly, setOverdueOnly] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
   useEffect(() => {
     const getUser = async () => {
@@ -100,6 +101,25 @@ export default function PaymentsPage() {
     getUser()
     fetchContracts()
     fetchPayments()
+  }, [])
+
+  useEffect(() => {
+    // Detectar tema atual
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark')
+      setIsDarkMode(isDark)
+    }
+    
+    checkTheme()
+    
+    // Observar mudanças no tema
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+    
+    return () => observer.disconnect()
   }, [])
 
   const fetchContracts = async () => {
@@ -405,22 +425,27 @@ export default function PaymentsPage() {
                   {contractPayments.length > 0 ? (
                     <div className="space-y-4">
                       {/* Payment Summary */}
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div 
+                        className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+                        style={{
+                          backgroundColor: isDarkMode ? '#1f2937' : 'white'
+                        }}
+                      >
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-green-600">{paidPayments.length}</div>
-                          <div className="text-sm text-gray-600">Pagas</div>
+                          <div className="text-2xl font-bold text-green-600 dark:text-green-400">{paidPayments.length}</div>
+                          <div className="text-sm dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Pagas</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-yellow-600">{pendingPayments.length}</div>
-                          <div className="text-sm text-gray-600">Pendentes</div>
+                          <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{pendingPayments.length}</div>
+                          <div className="text-sm dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Pendentes</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-red-600">{overduePayments.length}</div>
-                          <div className="text-sm text-gray-600">Atrasadas</div>
+                          <div className="text-2xl font-bold text-red-600 dark:text-red-400">{overduePayments.length}</div>
+                          <div className="text-sm dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Atrasadas</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-blue-600">{contractPayments.length}</div>
-                          <div className="text-sm text-gray-600">Total</div>
+                          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{contractPayments.length}</div>
+                          <div className="text-sm dark:text-gray-300" style={{ color: !isDarkMode ? '#111827' : undefined }}>Total</div>
                         </div>
                       </div>
 

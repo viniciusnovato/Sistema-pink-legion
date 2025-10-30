@@ -100,6 +100,7 @@ export default function ContractViewPage() {
   const [uploading, setUploading] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
   useEffect(() => {
     checkUser()
@@ -107,6 +108,25 @@ export default function ContractViewPage() {
       fetchContractDetails()
     }
   }, [contractId])
+
+  useEffect(() => {
+    // Detectar tema atual
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark')
+      setIsDarkMode(isDark)
+    }
+    
+    checkTheme()
+    
+    // Observar mudanças no tema
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+    
+    return () => observer.disconnect()
+  }, [])
 
   const checkUser = async () => {
     try {
@@ -1042,41 +1062,48 @@ export default function ContractViewPage() {
                   doc.category !== 'contract_signed' && 
                   (doc.file_name?.toLowerCase().includes('contrato') || doc.file_name?.toLowerCase().includes('confissao'))
                 ).length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {contractDocuments
                       .filter(doc => 
                         doc.category !== 'contract_signed' && 
                         (doc.file_name?.toLowerCase().includes('contrato') || doc.file_name?.toLowerCase().includes('confissao'))
                       )
                       .map((doc) => (
-                        <div key={doc.id} className="flex items-center justify-between bg-orange-50 dark:bg-orange-900/20 p-3 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                            <div>
-                              <span className="text-sm text-orange-700 dark:text-orange-300 block">
+                        <div 
+                          key={doc.id} 
+                          className="flex items-center justify-between p-4 rounded-lg border-2 shadow-sm min-h-[100px]" 
+                          style={{
+                            backgroundColor: isDarkMode ? '#1f2937' : 'white',
+                            borderColor: '#f97316'
+                          }}
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <FileText className="h-5 w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <span className="text-base text-orange-500 dark:text-orange-300 block font-bold break-words">
                                 {doc.file_name}
                               </span>
-                              <span className="text-xs text-orange-600 dark:text-orange-400">
+                              <span className="text-sm text-orange-500 dark:text-orange-400 font-semibold">
                                 {doc.category || 'Documento'}
                               </span>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-3 flex-shrink-0 ml-4">
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => downloadDocument(doc)}
-                              className="text-orange-600 hover:text-orange-700"
+                              className="text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 p-2"
                             >
-                              <Download className="h-4 w-4" />
+                              <Download className="h-5 w-5" />
                             </Button>
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => deleteDocument(doc)}
-                              className="text-red-600 hover:text-red-700"
+                              className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-5 w-5" />
                             </Button>
                           </div>
                         </div>
@@ -1120,38 +1147,45 @@ export default function ContractViewPage() {
                 </div>
                 
                 {contractDocuments.filter(doc => doc.category === 'contract_signed').length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {contractDocuments
                       .filter(doc => doc.category === 'contract_signed')
                       .map((doc) => (
-                        <div key={doc.id} className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-green-600 dark:text-green-400" />
-                            <div>
-                              <span className="text-sm text-green-700 dark:text-green-300 block">
+                        <div 
+                          key={doc.id} 
+                          className="flex items-center justify-between p-4 rounded-lg border-2 shadow-sm min-h-[100px]" 
+                          style={{
+                            backgroundColor: isDarkMode ? '#1f2937' : 'white',
+                            borderColor: '#22c55e'
+                          }}
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <FileText className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <span className="text-base text-green-500 dark:text-green-300 block font-bold break-words">
                                 {doc.file_name}
                               </span>
-                              <span className="text-xs text-green-600 dark:text-green-400">
+                              <span className="text-sm text-green-500 dark:text-green-400 font-semibold">
                                 Contrato Assinado
                               </span>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-3 flex-shrink-0 ml-4">
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => downloadDocument(doc)}
-                              className="text-green-600 hover:text-green-700"
+                              className="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 p-2"
                             >
-                              <Download className="h-4 w-4" />
+                              <Download className="h-5 w-5" />
                             </Button>
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => deleteDocument(doc)}
-                              className="text-red-600 hover:text-red-700"
+                              className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-5 w-5" />
                             </Button>
                           </div>
                         </div>
@@ -1236,14 +1270,21 @@ export default function ContractViewPage() {
                     !doc.file_name?.toLowerCase().includes('confissao')
                   )
                   .map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                    <div 
+                      key={doc.id} 
+                      className="flex items-center justify-between p-3 rounded-lg border-2 shadow-sm" 
+                      style={{
+                        backgroundColor: isDarkMode ? '#1f2937' : 'white',
+                        borderColor: '#3b82f6'
+                      }}
+                    >
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                         <div>
-                          <span className="text-sm text-blue-700 dark:text-blue-300 block">
+                          <span className="text-sm text-blue-500 dark:text-blue-300 block font-bold">
                             {doc.document_name || doc.file_name}
                           </span>
-                          <span className="text-xs text-blue-600 dark:text-blue-400">
+                          <span className="text-xs text-blue-500 dark:text-blue-400 font-semibold">
                             {doc.document_type || doc.file_type}
                           </span>
                         </div>
@@ -1253,7 +1294,7 @@ export default function ContractViewPage() {
                           size="sm"
                           variant="ghost"
                           onClick={() => downloadDocument(doc)}
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                         >
                           <Download className="h-4 w-4" />
                         </Button>
@@ -1261,7 +1302,7 @@ export default function ContractViewPage() {
                           size="sm"
                           variant="ghost"
                           onClick={() => deleteDocument(doc)}
-                          className="text-red-600 hover:text-red-700"
+                          className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -1293,14 +1334,21 @@ export default function ContractViewPage() {
                     !doc.file_name?.toLowerCase().includes('confissao')
                   )
                   .map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
+                    <div 
+                      key={doc.id} 
+                      className="flex items-center justify-between p-3 rounded-lg border-2 shadow-sm" 
+                      style={{
+                        backgroundColor: isDarkMode ? '#1f2937' : 'white',
+                        borderColor: '#8b5cf6'
+                      }}
+                    >
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                         <div>
-                          <span className="text-sm text-purple-700 dark:text-purple-300 block">
+                          <span className="text-sm text-purple-500 dark:text-purple-300 block font-bold">
                             {doc.document_name || doc.file_name}
                           </span>
-                          <span className="text-xs text-purple-600 dark:text-purple-400">
+                          <span className="text-xs text-purple-500 dark:text-purple-400 font-semibold">
                             {doc.document_type || doc.file_type}
                           </span>
                         </div>
@@ -1310,7 +1358,7 @@ export default function ContractViewPage() {
                           size="sm"
                           variant="ghost"
                           onClick={() => downloadDocument(doc)}
-                          className="text-purple-600 hover:text-purple-700"
+                          className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
                         >
                           <Download className="h-4 w-4" />
                         </Button>
@@ -1318,7 +1366,7 @@ export default function ContractViewPage() {
                           size="sm"
                           variant="ghost"
                           onClick={() => deleteDocument(doc)}
-                          className="text-red-600 hover:text-red-700"
+                          className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
