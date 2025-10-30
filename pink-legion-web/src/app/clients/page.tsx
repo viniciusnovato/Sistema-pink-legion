@@ -278,7 +278,7 @@ export default function ClientsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-bold" style={{color: '#111827 !important'}}>
               Gestão de Clientes
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">

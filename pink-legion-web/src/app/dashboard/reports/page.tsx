@@ -264,7 +264,7 @@ export default function ReportsPage() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Relatórios</h1>
+            <h1 className="text-3xl font-bold" style={{color: isDarkMode ? '#ffffff' : '#111827'}}>Relatórios</h1>
             <p className="text-gray-600">KPIs e resumos com dados reais</p>
           </div>
         </div>

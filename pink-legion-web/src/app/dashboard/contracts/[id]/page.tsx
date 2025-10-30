@@ -1215,24 +1215,28 @@ export default function ContractViewPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {carPhotos.map((photo) => (
-                  <div key={photo.id} className="flex items-center justify-between bg-teal-50 dark:bg-teal-900/20 p-3 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <ImageIcon className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                      <div>
-                        <span className="text-sm text-teal-700 dark:text-teal-300 block">
+                  <div key={photo.id} className="flex items-center justify-between border-2 p-3 rounded-lg" style={{
+                    backgroundColor: 'white !important',
+                    borderColor: '#d1d5db !important'
+                  }}>
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <ImageIcon className="h-4 w-4 flex-shrink-0" style={{color: '#374151 !important'}} />
+                      <div className="min-w-0 flex-1">
+                        <span className="text-sm block font-bold truncate" style={{color: '#111827 !important'}}>
                           {photo.file_name || photo.photo_url?.split('/').pop()}
                         </span>
-                        <span className="text-xs text-teal-600 dark:text-teal-400">
+                        <span className="text-xs" style={{color: '#6b7280 !important'}}>
                           {photo.category || 'Foto do Carro'}
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1 flex-shrink-0">
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => downloadPhoto(photo)}
-                        className="text-teal-600 hover:text-teal-700"
+                        style={{color: '#374151 !important'}}
+                        className="hover:opacity-80"
                       >
                         <Download className="h-4 w-4" />
                       </Button>
