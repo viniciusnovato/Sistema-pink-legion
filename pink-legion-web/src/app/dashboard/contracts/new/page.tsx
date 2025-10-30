@@ -1046,17 +1046,15 @@ export default function NewContractPage() {
 
         {/* Botão de Gerar */}
         <div className="flex justify-end">
-              <Button
-                onClick={handleGenerateContract}
-                disabled={!selectedCar || !selectedClient || !salePrice}
-                className="flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
-              >
-                <Download className="h-4 w-4" />
-                Gerar Contratos PDF
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          <Button
+            onClick={handleGenerateContract}
+            disabled={!selectedCar || !selectedClient || !salePrice}
+            className="flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+          >
+            <Download className="h-4 w-4" />
+            Gerar Contratos PDF
+          </Button>
+        </div>
       </div>
     </DashboardLayout>
   )
