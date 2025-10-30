@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '../ui/Card';
 
@@ -24,6 +24,19 @@ export function MetricCard({
   description,
   color = 'primary' 
 }: MetricCardProps) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    };
+    
+    checkTheme();
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    
+    return () => observer.disconnect();
+  }, []);
   const colorClasses = {
     primary: {
       icon: 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400',
@@ -52,10 +65,10 @@ export function MetricCard({
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900 dark:text-text-secondary-dark mb-1">
+            <p className="text-sm font-medium mb-1" style={{color: isDarkMode ? '#d1d5db' : '#111827'}}>
               {title}
             </p>
-            <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">
+            <p className="text-2xl font-bold" style={{color: isDarkMode ? '#ffffff' : '#111827'}}>
               {value}
             </p>
             {description && (
