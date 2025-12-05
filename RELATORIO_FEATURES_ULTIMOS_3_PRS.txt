@@ -84,3 +84,4 @@ Observações finais
 - PR #4 foi puramente visual, sem alteração de comportamento.
 - PR #3 consolidou base de tema dinâmico e sessão/role do usuário no dashboard, essencial para RBAC e consistência.
 - PR #2 trouxe os maiores avanços funcionais: mídia de veículos e finanças por carro, junto de refinamentos de dados de clientes e hardening de imagens/CSP no Next.js.
+
