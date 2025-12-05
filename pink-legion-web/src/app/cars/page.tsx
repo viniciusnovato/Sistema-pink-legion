@@ -20,7 +20,7 @@ interface Car {
   fuel_type: string;
   transmission: string;
   color: string;
-  status: 'available' | 'sold' | 'reserved' | 'maintenance';
+  status: 'disponivel' | 'vendido' | 'reservado';
   images?: string[];
   photo_url?: string | null;
   created_at: string;
@@ -63,7 +63,7 @@ export default function CarsPage() {
   const checkUser = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         logger.auth('No user found, redirecting to login');
         router.push('/login');
@@ -71,7 +71,7 @@ export default function CarsPage() {
       }
 
       setUser(user);
-      
+
       // Fetch user profile
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -169,14 +169,12 @@ export default function CarsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'available':
+      case 'disponivel':
         return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
-      case 'sold':
+      case 'vendido':
         return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
-      case 'reserved':
+      case 'reservado':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
-      case 'maintenance':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
     }
@@ -184,14 +182,12 @@ export default function CarsPage() {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'available':
+      case 'disponivel':
         return 'Disponível';
-      case 'sold':
+      case 'vendido':
         return 'Vendido';
-      case 'reserved':
+      case 'reservado':
         return 'Reservado';
-      case 'maintenance':
-        return 'Manutenção';
       default:
         return status;
     }
@@ -240,7 +236,7 @@ export default function CarsPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => {/* TODO: Export functionality */}}
+              onClick={() => {/* TODO: Export functionality */ }}
             >
               <Download className="h-4 w-4 mr-2" />
               Exportar
@@ -277,10 +273,9 @@ export default function CarsPage() {
                   className="w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md bg-bg-light dark:bg-bg-dark text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-rose-gold-500"
                 >
                   <option value="all">Todos os Status</option>
-                  <option value="available">Disponível</option>
-                  <option value="sold">Vendido</option>
-                  <option value="reserved">Reservado</option>
-                  <option value="maintenance">Manutenção</option>
+                  <option value="disponivel">Disponível</option>
+                  <option value="vendido">Vendido</option>
+                  <option value="reservado">Reservado</option>
                 </select>
               </div>
             </div>
@@ -303,7 +298,7 @@ export default function CarsPage() {
                   Nenhum carro encontrado
                 </h3>
                 <p className="text-text-light-secondary dark:text-text-dark-secondary mb-4">
-                  {cars.length === 0 
+                  {cars.length === 0
                     ? 'Comece adicionando seu primeiro carro ao inventário.'
                     : 'Tente ajustar os filtros de pesquisa.'
                   }

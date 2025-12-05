@@ -66,15 +66,15 @@ export default function CarsPage() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      
+
       // Debug: verificar se photo_url está vindo
-      console.log('Carros carregados:', data?.map(car => ({ 
-        id: car.id, 
-        brand: car.brand, 
+      console.log('Carros carregados:', data?.map(car => ({
+        id: car.id,
+        brand: car.brand,
         model: car.model,
-        photo_url: car.photo_url 
+        photo_url: car.photo_url
       })))
-      
+
       setCars(data || [])
     } catch (error) {
       console.error('Erro ao buscar carros:', error)
@@ -90,7 +90,7 @@ export default function CarsPage() {
         .insert([formData])
 
       if (error) throw error
-      
+
       fetchCars()
       setShowAddModal(false)
       resetForm()
@@ -109,7 +109,7 @@ export default function CarsPage() {
         .eq('id', selectedCar.id)
 
       if (error) throw error
-      
+
       fetchCars()
       setShowEditModal(false)
       resetForm()
@@ -199,13 +199,19 @@ export default function CarsPage() {
 
   const filteredCars = cars.filter(car => {
     const matchesSearch = car.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         car.license_plate.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = !statusFilter || car.status === statusFilter
+      car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      car.license_plate.toLowerCase().includes(searchTerm.toLowerCase())
+
+    // Normalize status values by trimming whitespace and converting to lowercase for comparison
+    const normalizedCarStatus = car.status?.toString().trim().toLowerCase()
+    const normalizedStatusFilter = statusFilter?.toString().trim().toLowerCase()
+
+    const matchesStatus = !statusFilter || normalizedCarStatus === normalizedStatusFilter
     const matchesBrand = !brandFilter || car.brand.toLowerCase().includes(brandFilter.toLowerCase())
-    
+
     return matchesSearch && matchesStatus && matchesBrand
   })
+
 
   if (loading) {
     return (
@@ -287,7 +293,7 @@ export default function CarsPage() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -305,7 +311,7 @@ export default function CarsPage() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -323,7 +329,7 @@ export default function CarsPage() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -535,7 +541,7 @@ export default function CarsPage() {
                   rows={3}
                   className="w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-xl bg-surface-light dark:bg-surface-dark text-text-primary-light dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 resize-none"
                 />
-                
+
                 <div className="flex gap-2 pt-4">
                   <Button
                     variant="outline"
@@ -633,7 +639,7 @@ export default function CarsPage() {
                   rows={3}
                   className="w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-xl bg-surface-light dark:bg-surface-dark text-text-primary-light dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 resize-none"
                 />
-                
+
                 <div className="flex gap-2 pt-4">
                   <Button
                     variant="outline"
